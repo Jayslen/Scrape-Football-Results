@@ -1,5 +1,5 @@
 export async function getRoundMatches ({ page }) {
-  const matches = []
+  const data = { league: null, matchWeek: null, matches: [] }
 
   const links = await page.$$eval('.e1am6mxg0 a',
     links => {
@@ -7,8 +7,10 @@ export async function getRoundMatches ({ page }) {
     }
   )
 
+  data.league = await page.locator('.e1i7jfg80').innerText()
+
   for (const matchLink of links) {
-    await page.goto(`https://www.fotmob.com${matchLink}`, { waitUntil: 'networkidle' })
+    await page.goto(`https://www.fotmob.com${matchLink}`, { waitUntil: 'load' })
 
     const teams = await page.$$eval('.e10mt4ks0', teams => teams.map((node) => {
       return node.textContent
@@ -30,7 +32,7 @@ export async function getRoundMatches ({ page }) {
       return Array.from($ul.children).map(li => li.textContent)
     })
 
-    matches.push({
+    data.matches.push({
       teams,
       goals: matchGoals,
       details: {
@@ -39,5 +41,7 @@ export async function getRoundMatches ({ page }) {
     })
   }
 
-  return matches
+  data.matchWeek = data.matches[0]?.details?.matchWeek
+
+  return data
 }

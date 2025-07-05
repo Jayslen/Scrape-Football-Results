@@ -1,6 +1,6 @@
 import { chromium } from 'playwright'
-import fs from 'fs/promises'
 import { getRoundMatches } from './utils/roundMatches.js'
+import { writeMatchesData } from './utils/writeFiles.js'
 
 export class Commands {
   constructor () {
@@ -11,12 +11,12 @@ export class Commands {
   }
 
   async rounds (data) {
-    const { season, league, options: { round, from = 0, to = 38 } } = data
+    const { season, league, options: { round, from = 1, to = 38 } } = data
     const pagePath = this.leagues.find((data) => data.acrom === league)
 
     let browser
     try {
-      browser = await chromium.launch({ headless: true })
+      browser = await chromium.launch({ headless: false })
       const context = await browser.newContext()
       const page = await context.newPage()
 
@@ -26,19 +26,29 @@ export class Commands {
         footmobPage += `&round=${round - 1}`
         await page.goto(footmobPage)
         const results = await getRoundMatches({ page })
-        const leagueRound = results[0]?.details?.matchWeek
 
         try {
-          await fs.writeFile(`./${leagueRound}.json`, JSON.stringify(results))
-          console.log('Datos escritos')
-        } catch (e) {
-          console.error(e)
+          await writeMatchesData({ data: results })
+        } catch (Error) {
+          console.error(Error)
+          process.exit(1)
+        } finally {
+          await browser.close()
         }
         return
       }
 
       for (let i = from; i <= to; i++) {
-        await page.goto(footmobPage + `&round=${i}`)
+        console.log(i)
+        await page.goto(footmobPage + `&round=${i - 1}`, { waitUntil: 'networkidle' })
+        const results = await getRoundMatches({ page })
+
+        try {
+          await writeMatchesData({ data: results })
+        } catch (Error) {
+          console.error('Error writing data', Error)
+          process.exit(1)
+        }
       }
     } catch (error) {
       console.error(error)
