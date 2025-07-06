@@ -22,6 +22,15 @@ export class Commands {
 
       let footmobPage = `https://www.fotmob.com/leagues/${pagePath.id}/matches/${pagePath.path}?season=${season}&group=by-round`
 
+      await page.route('**/*', (route) => {
+        const blocked = ['image', 'font']
+        if (blocked.includes(route.request().resourceType())) {
+          route.abort()
+        } else {
+          route.continue()
+        }
+      })
+
       if (round) {
         footmobPage += `&round=${round - 1}`
         await page.goto(footmobPage)
@@ -39,8 +48,7 @@ export class Commands {
       }
 
       for (let i = from; i <= to; i++) {
-        console.log(i)
-        await page.goto(footmobPage + `&round=${i - 1}`, { waitUntil: 'networkidle' })
+        await page.goto(footmobPage + `&round=${i - 1}`, { waitUntil: 'domcontentloaded' })
         const results = await getRoundMatches({ page })
 
         try {

@@ -9,7 +9,7 @@ const Actions = new Commands()
 program
   .name('Scrapping results')
   .version('1.0.0')
-  .description('A CLI application for scrapping data for footmob ')
+  .description('A CLI application for scrapping data for footmob')
 
 program.command('round <league> <season>')
   .description('Fetch rounds for a specific league')

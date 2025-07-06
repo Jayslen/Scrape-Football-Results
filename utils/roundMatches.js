@@ -35,10 +35,60 @@ export async function getRoundMatches ({ page }) {
     data.matches.push({
       teams,
       goals: matchGoals,
+      playersStats: [],
       details: {
         date, matchWeek, stadium, attendance
       }
     })
+
+    const playersAnchor = page.locator('.e1ugt93g0 > .e1ugt93g1 a')
+
+    for (const $a of await playersAnchor.all()) {
+      await $a.click()
+      await page.waitForSelector('.e1txahpl9', { state: 'visible', timeout: 10000 })
+
+      const [score, name, position] = await page.$eval('.e1txahpl0', data => data.innerText.trim().split('\n'))
+
+      const playerStats = await page.$$eval('.e1txahpl9 .e1txahpl2 li:not(:first-child)', data => {
+        const keysToModified = ['accurate_passes', 'shots_on_target', 'tackles_won', 'ground_duels_won', 'aerial_duels_won']
+
+        return data.map(li => {
+          const [key, value] = li.innerText.trim().split('\n')
+
+          const camelCaseKey = key.toLowerCase().replaceAll(' ', '_')
+
+          if (keysToModified.includes(camelCaseKey)) {
+            const [successful, total] = value.split('/').map((val) => Number(val.replace(/\(\d+%\)/g, '').trim()))
+            const missed = total - successful
+            const lastWordKey = camelCaseKey.split('_').at(-1)
+
+            const successfulKey = lastWordKey === 'passes' ? 'successful' : lastWordKey === 'target' ? 'on_target' : 'won'
+            const missedKey = successfulKey === 'won' ? 'lost' : successfulKey === 'on_target' ? 'off_target' : 'missed'
+
+            const statKey = lastWordKey === 'won' ? camelCaseKey.split('_').slice(0, -1).join('_') : lastWordKey === 'target' ? 'shots' : 'passes'
+
+            return [statKey,
+              Object.fromEntries([
+                ['total', total],
+                [successfulKey, successful],
+                [missedKey, missed]
+              ])
+            ]
+          } else {
+            return [camelCaseKey, Number(value.trim()) ?? value.trim()]
+          }
+        })
+      })
+
+      data.matches.at(-1).playersStats.push({
+        name,
+        position,
+        score,
+        stats: Object.fromEntries(playerStats)
+      })
+
+      await page.getByRole('button').and(page.getByText('done')).click()
+    }
   }
 
   data.matchWeek = data.matches[0]?.details?.matchWeek
