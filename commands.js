@@ -48,7 +48,7 @@ export class Commands {
       }
 
       for (let i = from; i <= to; i++) {
-        await page.goto(footmobPage + `&round=${i - 1}`, { waitUntil: 'domcontentloaded' })
+        await page.goto(footmobPage + `&round=${i - 1}`, { waitUntil: 'load' })
         const results = await getRoundMatches({ page })
 
         try {
