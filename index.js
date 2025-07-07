@@ -4,6 +4,7 @@ import { program } from 'commander'
 import { Commands } from './commands.js'
 import { valiateRoundSchema } from './schemas/match.js'
 import { prettifyError } from 'zod/v4'
+import { validateTeamsSchema } from './schemas/teams.js'
 
 const Actions = new Commands()
 program
@@ -27,6 +28,17 @@ program.command('round <league> <season>')
       return
     }
     await Actions.rounds({ ...data })
+  })
+
+program.command('teams <league> <season>')
+  .description('Fetch teams for a specific league')
+  .action(async (league, season = '2023-2024') => {
+    const { success, data, error } = validateTeamsSchema({ league, season })
+    if (!success) {
+      console.error(prettifyError(error))
+      return
+    }
+    await Actions.teams({ league: data.league, season: data.season })
   })
 
 program.parse()
