@@ -81,33 +81,49 @@ export class Commands {
 
       await page.goto(url, { waitUntil: 'load' })
 
-      const teamsLinks = await page.$$eval('.eo46u7w0 > a', links => links.map(link => link.href.replace('overview', 'squad')))
+      const teamsLinks = await page.$$eval('.eo46u7w0 > a', links => links.map(link => link.href))
 
       const teams = []
-      for (const teamLink of teamsLinks.slice(0, 1)) {
+      for (const teamLink of teamsLinks) {
         await page.goto(teamLink, { waitUntil: 'load' })
 
-        const teamName = await page.$eval('.e1i7jfg82 .e1i7jfg81', el => el.innerText.trim())
-        const players = await page.$$eval('table tbody > tr', rows => rows.map((row) => {
-          const data = row.innerText.trim().split('\n').map(text => text.trim())
-          const players = []
-          const [name, positions, country, extra] = data
-          const [shirt, age, height, value] = extra.replace(/cm|€/g, '').split('\t')
-            .map((data) => Number.isNaN(Number(data)) ? data : Number(data))
+        // Find a way to improve the stadium data extraction
+        const stadiumData = await page.$eval('.e1vbwb212', el => el.innerText.trim().split('\n'))
+        const stadium = {
+          name: stadiumData[0],
+          capacity: stadiumData[2],
+          yearOpened: stadiumData[4],
+          surface: stadiumData[6]
+        }
+        const teamName = await page.$eval('.eptdz4j1', el => el.innerText.trim())
 
-          players.push({ name, positions: positions.split(', '), country, shirt, age, height, value })
-          return players
+        // find a way to improve the waiting for the squad to load
+        await page.getByRole('link').and(page.getByText('Squad')).click()
+
+        await page.waitForSelector('.e152ovrx0')
+        await page.waitForTimeout(1000)
+
+        const players = await page.$$eval('table tbody tr', rows => rows.map((row) => {
+          const [name, positions, country, shirt, age, height, marketValue] = row.querySelectorAll('td')
+          return {
+            name: name.innerText.split('\n')[0],
+            positions: positions.innerText.split(', '),
+            country: country.innerText,
+            shirt: shirt.innerText,
+            age: Number(age.innerText),
+            height: Number(height.innerText.replace('cm', '')),
+            marketValue: marketValue.innerText.replace('€', '').replace(/,/g, '')
+          }
         }))
 
-        teams.push({ teamName, players: players.flat() })
+        teams.push({ teamName, players: players.flat(), stadium })
       }
 
-      writeMatchesData({
+      writeData({
         data: teams,
         dir: `teams/${league}`,
         fileName: `/${season.replace('-', '_')}.json`
       })
-      console.log(teams)
     } catch (error) {
       console.error(error)
       process.exit(1)
