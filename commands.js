@@ -13,7 +13,7 @@ export class Commands {
 
   async rounds (data) {
     const { season, league, options: { round, from = 1, to = 38 } } = data
-    const pagePath = this.leagues.find((data) => data.acrom === league)
+    const leagueSelected = this.leagues.find((data) => data.acrom === league)
 
     let browser
     try {
@@ -22,7 +22,7 @@ export class Commands {
       const page = await context.newPage()
       blockExtraResources(page)
 
-      let footmobPage = `https://www.fotmob.com/leagues/${pagePath.id}/matches/${pagePath.path}?season=${season}&group=by-round`
+      let footmobPage = `https://www.fotmob.com/leagues/${leagueSelected.id}/matches/${leagueSelected.path}?season=${season}&group=by-round`
 
       if (round) {
         footmobPage += `&round=${round - 1}`
@@ -68,9 +68,9 @@ export class Commands {
   }
 
   async teams ({ league, season }) {
-    const pagePath = this.leagues.find((data) => data.acrom === league)
+    const leagueSelected = this.leagues.find((data) => data.acrom === league)
 
-    const url = `https://www.fotmob.com/leagues/${pagePath.id}/table/${pagePath.path}?season=${season}`
+    const url = `https://www.fotmob.com/leagues/${leagueSelected.id}/table/${leagueSelected.path}?season=${season}`
 
     let browser
     try {
@@ -97,11 +97,9 @@ export class Commands {
         }
         const teamName = await page.$eval('.eptdz4j1', el => el.innerText.trim())
 
-        // find a way to improve the waiting for the squad to load
         await page.getByRole('link').and(page.getByText('Squad')).click()
 
-        await page.waitForSelector('.e152ovrx0')
-        await page.waitForTimeout(1000)
+        await page.waitForSelector('table', { timeout: 10000 })
 
         const players = await page.$$eval('table tbody tr', rows => rows.map((row) => {
           const [name, positions, country, shirt, age, height, marketValue] = row.querySelectorAll('td')
@@ -109,7 +107,7 @@ export class Commands {
             name: name.innerText.split('\n')[0],
             positions: positions.innerText.split(', '),
             country: country.innerText,
-            shirt: shirt.innerText,
+            shirt: shirt.innerText ?? null,
             age: Number(age.innerText),
             height: Number(height.innerText.replace('cm', '')),
             marketValue: marketValue.innerText.replace('€', '').replace(/,/g, '')
@@ -121,8 +119,8 @@ export class Commands {
 
       writeData({
         data: teams,
-        dir: `teams/${league}`,
-        fileName: `/${season.replace('-', '_')}.json`
+        dir: 'teams',
+        fileName: `/${leagueSelected.path}.json`
       })
     } catch (error) {
       console.error(error)

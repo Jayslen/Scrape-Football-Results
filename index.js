@@ -30,10 +30,10 @@ program.command('round <league> <season>')
     await Actions.rounds({ ...data })
   })
 
-program.command('teams <league> <season>')
+program.command('teams <league>')
   .description('Fetch teams for a specific league')
-  .action(async (league, season = '2023-2024') => {
-    const { success, data, error } = validateTeamsSchema({ league, season })
+  .action(async (league) => {
+    const { success, data, error } = validateTeamsSchema({ league })
     if (!success) {
       console.error(prettifyError(error))
       return
