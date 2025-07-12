@@ -32,7 +32,7 @@ export class Commands {
         try {
           await writeData({
             data: results,
-            dir: `${results.league.replaceAll(' ', '-')}`,
+            dir: `matches/${leagueSelected.path}/${season}`,
             fileName: `/${results.matchWeek.replaceAll(' ', '-')}.json`
           })
         } catch (Error) {
@@ -51,7 +51,7 @@ export class Commands {
         try {
           await writeData({
             data: results,
-            dir: `${results.league.replaceAll(' ', '-')}`,
+            dir: `matches/${leagueSelected.path}/${season}`,
             fileName: `/${results.matchWeek.replaceAll(' ', '-')}.json`
           })
         } catch (Error) {
@@ -120,7 +120,7 @@ export class Commands {
       writeData({
         data: teams,
         dir: 'teams',
-        fileName: `/${leagueSelected.path}.json`
+        fileName: `/${leagueSelected.path}-teams.json`
       })
     } catch (error) {
       console.error(error)
