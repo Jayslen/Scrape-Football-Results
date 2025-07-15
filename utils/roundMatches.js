@@ -7,7 +7,7 @@ export async function getRoundMatches ({ page }) {
     }
   )
 
-  data.league = await page.locator('.e1i7jfg80').innerText()
+  data.league = await page.locator('.eptdz4j1').innerText()
 
   for (const matchLink of links) {
     await page.goto(`https://www.fotmob.com${matchLink}`, { waitUntil: 'load' })
@@ -41,20 +41,25 @@ export async function getRoundMatches ({ page }) {
       }
     })
 
-    const playersAnchor = page.locator('.e1ugt93g0 > .e1ugt93g1 a')
+    if (await page.locator('.e1edwvyy9').innerText() === 'Abandoned') continue
 
-    for (const $a of await playersAnchor.all()) {
+    const startersPlayersAnchor = await page.locator('.e1ugt93g0 div > a').all()
+    const benchPlayersAnchor = await page.locator('.e1ymsyw60:nth-child(8) ul li a').all()
+
+    const allPlayers = [...startersPlayersAnchor, ...benchPlayersAnchor]
+    for (const $a of allPlayers) {
+      const iteration = allPlayers.indexOf($a) + 1
+
       await $a.click()
-      await page.waitForSelector('.e1txahpl9', { state: 'visible', timeout: 10000 })
+      await page.waitForSelector('.e123zo9c9', { state: 'visible' })
 
-      const [score, name, position] = await page.$eval('.e1txahpl0', data => data.innerText.trim().split('\n'))
+      const [score, name, position] = await page.$eval('.e123zo9c9', data => data.innerText.trim().split('\n'))
 
-      const playerStats = await page.$$eval('.e1txahpl9 .e1txahpl2 li:not(:first-child)', data => {
+      const playerStats = await page.$$eval('.e123zo9c10 .e123zo9c2 li:not(:first-child)', data => {
         const keysToModified = ['accurate_passes', 'shots_on_target', 'tackles_won', 'ground_duels_won', 'aerial_duels_won']
 
-        return data.map(li => {
+        return data.reduce((acc, li) => {
           const [key, value] = li.innerText.trim().split('\n')
-
           const camelCaseKey = key.toLowerCase().replaceAll(' ', '_')
 
           if (keysToModified.includes(camelCaseKey)) {
@@ -67,24 +72,25 @@ export async function getRoundMatches ({ page }) {
 
             const statKey = lastWordKey === 'won' ? camelCaseKey.split('_').slice(0, -1).join('_') : lastWordKey === 'target' ? 'shots' : 'passes'
 
-            return [statKey,
-              Object.fromEntries([
-                ['total', total],
-                [successfulKey, successful],
-                [missedKey, missed]
-              ])
-            ]
+            acc[`${statKey}_total`] = total
+            acc[`${statKey}_${successfulKey}`] = successful
+            acc[`${statKey}_${missedKey}`] = missed
           } else {
-            return [camelCaseKey, Number(value.trim()) ?? value.trim()]
+            const cleanedValue = isNaN(Number(value.trim())) ? value.trim() : Number(value.trim())
+            acc[camelCaseKey] = cleanedValue
           }
-        })
+
+          return acc
+        }, {})
       })
+
+      playerStats.starter = iteration <= 22
 
       data.matches.at(-1).playersStats.push({
         name,
         position,
         score,
-        stats: Object.fromEntries(playerStats)
+        stats: playerStats
       })
 
       await page.getByRole('button').and(page.getByText('done')).click()
