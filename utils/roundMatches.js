@@ -56,25 +56,29 @@ export async function getRoundMatches ({ page }) {
       const [score, name, position] = await page.$eval('.e123zo9c9', data => data.innerText.trim().split('\n'))
 
       const playerStats = await page.$$eval('.e123zo9c10 .e123zo9c2 li:not(:first-child)', data => {
-        const keysToModified = ['accurate_passes', 'shots_on_target', 'tackles_won', 'ground_duels_won', 'aerial_duels_won']
+        const statMappings = {
+          accurate_passes: { baseKey: 'passes', successKey: 'successful', failKey: 'missed' },
+          shots_on_target: { baseKey: 'shots', successKey: 'on_target', failKey: 'off_target' },
+          tackles_won: { baseKey: 'tackles', successKey: 'won', failKey: 'lost' },
+          ground_duels_won: { baseKey: 'ground_duels', successKey: 'won', failKey: 'lost' },
+          aerial_duels_won: { baseKey: 'aerial_duels', successKey: 'won', failKey: 'lost' },
+          accurate_long_balls: { baseKey: 'long_balls', successKey: 'successful', failKey: 'missed' },
+          successful_dribbles: { baseKey: 'dribbles', successKey: 'successful', failKey: 'missed' },
+          accurate_crosses: { baseKey: 'crosses', successKey: 'successful', failKey: 'missed' }
+        }
 
         return data.reduce((acc, li) => {
           const [key, value] = li.innerText.trim().split('\n')
           const camelCaseKey = key.toLowerCase().replaceAll(' ', '_')
 
-          if (keysToModified.includes(camelCaseKey)) {
+          if (statMappings[camelCaseKey]) {
             const [successful, total] = value.split('/').map((val) => Number(val.replace(/\(\d+%\)/g, '').trim()))
             const missed = total - successful
-            const lastWordKey = camelCaseKey.split('_').at(-1)
+            const { baseKey, successKey, failKey } = statMappings[camelCaseKey]
 
-            const successfulKey = lastWordKey === 'passes' ? 'successful' : lastWordKey === 'target' ? 'on_target' : 'won'
-            const missedKey = successfulKey === 'won' ? 'lost' : successfulKey === 'on_target' ? 'off_target' : 'missed'
-
-            const statKey = lastWordKey === 'won' ? camelCaseKey.split('_').slice(0, -1).join('_') : lastWordKey === 'target' ? 'shots' : 'passes'
-
-            acc[`${statKey}_total`] = total
-            acc[`${statKey}_${successfulKey}`] = successful
-            acc[`${statKey}_${missedKey}`] = missed
+            acc[`${baseKey}_total`] = total
+            acc[`${baseKey}_${successKey}`] = successful
+            acc[`${baseKey}_${failKey}`] = missed
           } else {
             const cleanedValue = isNaN(Number(value.trim())) ? value.trim() : Number(value.trim())
             acc[camelCaseKey] = cleanedValue
