@@ -7,7 +7,7 @@ import { prettifyError } from 'zod/v4'
 import { validateTeamsSchema } from './schemas/teams.js'
 import { League, LeagueSeason, Options } from '@customTypes/global'
 
-const Actions = new Commands()
+const Actions = await new Commands().init()
 program
   .name('Scrapping results')
   .version('1.0.0')

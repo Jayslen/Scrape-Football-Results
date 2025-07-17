@@ -6,11 +6,25 @@ import { League, LeaguesAvailable, Player, RoundSchema, Teams } from '@customTyp
 
 export class Commands {
   leagues: LeaguesAvailable
+  browser: Browser | undefined
+  page: Page | undefined
   constructor() {
     this.leagues = [
       { acrom: 'pl', path: 'premier-league', id: 47 },
       { acrom: 'laliga', path: 'laliga', id: 87 }
     ]
+  }
+
+  async init() {
+    if (!this.browser) {
+      this.browser = await chromium.launch({ headless: false })
+      const context = await this.browser.newContext()
+      this.page = await context.newPage()
+      blockExtraResources(this.page)
+    } else {
+      console.warn('Browser is already initialized.')
+    }
+    return this
   }
 
   async rounds(data: RoundSchema) {
@@ -22,18 +36,19 @@ export class Commands {
       process.exit(1)
     }
 
+    if (this.browser === undefined || this.page === undefined) {
+      console.error('Browser or page is not initialized. Try again')
+      process.exit(1)
+    }
+
     const roundStart = round ?? from
     const roundEnd = round ?? to
-
-    const browser = await chromium.launch({ headless: false })
-    const context = await browser.newContext()
-    const page = await context.newPage()
 
     let footmobPage = `https://www.fotmob.com/leagues/${leagueSelected.id}/matches/${leagueSelected.path}?season=${season}&group=by-round`
 
     for (let i = roundStart; i <= roundEnd; i++) {
-      await page.goto(footmobPage + `&round=${i - 1}`, { waitUntil: 'load' })
-      const results = await getRoundMatches(page)
+      await this.page.goto(footmobPage + `&round=${i - 1}`, { waitUntil: 'load' })
+      const results = await getRoundMatches(this.page)
 
       try {
         await writeData({
@@ -43,10 +58,9 @@ export class Commands {
         })
       } catch (Error) {
         console.error('Error writing data:', Error)
-        process.exit(1)
       }
       finally {
-        await browser.close()
+        await this.browser.close()
       }
     }
   }
@@ -59,38 +73,37 @@ export class Commands {
       process.exit(1)
     }
 
+    if (this.browser === undefined || this.page === undefined) {
+      console.error('Browser or page is not initialized. Try again')
+      process.exit(1)
+    }
+
     const url = `https://www.fotmob.com/leagues/${leagueSelected.id}/table/${leagueSelected.path}`
 
-    let browser
     try {
-      browser = await chromium.launch({ headless: false })
-      const context = await browser.newContext()
-      const page = await context.newPage()
-      blockExtraResources(page)
 
-      await page.goto(url, { waitUntil: 'load' })
-
-      const teamsLinks: string[] = await page.$$eval('.eo46u7w0 > a', (links) => links.map(link => (link as HTMLAnchorElement).href))
+      this.page.goto(url, { waitUntil: 'load' })
+      const teamsLinks: string[] = await this.page.$$eval('.eo46u7w0 > a', (links) => links.map(link => (link as HTMLAnchorElement).href))
 
       const teams: Teams = []
       for (const teamLink of teamsLinks) {
-        await page.goto(teamLink, { waitUntil: 'load' })
+        await this.page.goto(teamLink, { waitUntil: 'load' })
 
         // Find a way to improve the stadium data extraction
-        const stadiumData = await page.$eval('.e1vbwb212', el => (el as HTMLElement).innerText.trim().split('\n'))
+        const stadiumData = await this.page.$eval('.e1vbwb212', el => (el as HTMLElement).innerText.trim().split('\n'))
         const stadium = {
           name: stadiumData[0],
           capacity: stadiumData[2],
           yearOpened: stadiumData[4],
           surface: stadiumData[6]
         }
-        const teamName = await page.$eval('.eptdz4j1', el => (el as HTMLElement).innerText.trim())
+        const teamName = await this.page.$eval('.eptdz4j1', el => (el as HTMLElement).innerText.trim())
 
-        await page.getByRole('link').and(page.getByText('Squad')).click()
+        await this.page.getByRole('link').and(this.page.getByText('Squad')).click()
 
-        await page.waitForSelector('table', { timeout: 10000 })
+        await this.page.waitForSelector('table', { timeout: 10000 })
 
-        const players: Player = await page.$$eval('table tbody tr', rows => rows.map((row) => {
+        const players: Player = await this.page.$$eval('table tbody tr', rows => rows.map((row) => {
           const [name, positions, country, shirt, age, height, marketValue] = Array.from(row.querySelectorAll('td'))
           return {
             name: name.innerText.split('\n')[0],
@@ -114,7 +127,7 @@ export class Commands {
     } catch (error) {
       console.error('Error fetching teams:', error)
     } finally {
-      await browser?.close()
+      await this.browser.close()
     }
   }
 }

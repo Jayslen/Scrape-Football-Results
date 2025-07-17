@@ -14,7 +14,7 @@ export async function getRoundMatches(page: PlaywrightPage) {
   data.matchWeek = (await page.locator('.css-bp2mp7').innerText()).split(' ').at(-1)
 
 
-  for (const matchLink of links.slice(0, 1)) {
+  for (const matchLink of links) {
     await page.goto(`https://www.fotmob.com${matchLink}`, { waitUntil: 'load' })
 
     const teams = await page.locator('.e10mt4ks1').allInnerTexts()
@@ -25,7 +25,7 @@ export async function getRoundMatches(page: PlaywrightPage) {
         ul.querySelectorAll('li').forEach((li: HTMLElement) => {
           const scorer = li.querySelector('a span:first-child')?.textContent?.trim() || ''
           const minute = li.querySelector('a span:nth-child(2)')?.textContent?.trim() || ''
-          goals.push({ minute: minute.replaceAll('\'', '').split(', '), scorer: scorer })
+          goals.push({ minute: minute.replaceAll('\'', '').split(', '), scorer })
         })
         return goals
       })
@@ -51,7 +51,7 @@ export async function getRoundMatches(page: PlaywrightPage) {
     const benchPlayersAnchor = await page.locator('.e1ymsyw60:nth-child(8) ul li a').all()
 
     const allPlayers = [...startersPlayersAnchor, ...benchPlayersAnchor]
-    for (const $a of allPlayers.slice(0, 1)) {
+    for (const $a of allPlayers) {
       const iteration = allPlayers.indexOf($a) + 1
 
       await $a.click()
