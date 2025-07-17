@@ -1,7 +1,9 @@
 import path from 'node:path'
 import fs from 'node:fs/promises'
+import { MatchDetails, Teams } from '@customTypes/global'
 
-export async function writeData ({ data, dir, fileName }) {
+export async function writeData(filePaths: { data: MatchDetails | Teams, dir: string, fileName: string }) {
+  const { data, dir, fileName } = filePaths
   const { root } = path.parse(process.cwd())
 
   const route = path.join(root, 'football-stats', dir)

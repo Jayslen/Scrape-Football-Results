@@ -1,4 +1,6 @@
-export async function blockExtraResources (page) {
+import { PlaywrightPage } from '@customTypes/global'
+
+export async function blockExtraResources(page: PlaywrightPage) {
   await page.route('**/*', (route) => {
     const blocked = ['image', 'font']
     if (blocked.includes(route.request().resourceType())) {

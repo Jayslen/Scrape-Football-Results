@@ -1,6 +1,7 @@
 import z from 'zod'
+import { RoundSchema } from '@customTypes/global'
 
-const roundSchema = z.object({
+export const roundSchema = z.object({
   season: z.string().regex(/^\d{4}-\d{4}$/),
   league: z.enum(['pl', 'laliga']),
   options: z.object({
@@ -11,6 +12,6 @@ const roundSchema = z.object({
 
 })
 
-export const valiateRoundSchema = (input) => {
+export const valiateRoundSchema = (input: RoundSchema) => {
   return roundSchema.safeParse(input)
 }
