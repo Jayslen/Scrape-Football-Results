@@ -1,8 +1,10 @@
 import { PlaywrightPage, MatchDetails, MatchGoals, Goals, PlayerStats } from "@customTypes/global"
 import { statMappings } from '../utils/consts.js'
 
-export async function getRoundMatches(page: PlaywrightPage) {
+export async function getRoundMatches(input: { page: PlaywrightPage, totalMatches: number }) {
+  const { page, totalMatches } = input
   const data: MatchDetails = { league: '', matchWeek: '', matches: [] }
+  let matchesFetched = 0
 
   const links = await page.$$eval('.e1am6mxg0 a',
     links => {
@@ -16,7 +18,7 @@ export async function getRoundMatches(page: PlaywrightPage) {
 
   for (const matchLink of links) {
     await page.goto(`https://www.fotmob.com${matchLink}`, { waitUntil: 'load' })
-
+    // extract teams
     const teams = await page.locator('.e10mt4ks1').allInnerTexts()
 
     const matchGoals: MatchGoals = await page.$$eval('.e1x5klb29 ul', $uls => {
@@ -46,7 +48,7 @@ export async function getRoundMatches(page: PlaywrightPage) {
     })
 
     if (await page.locator('.e1edwvyy9').innerText() === 'Abandoned') continue
-
+    // extract players stats
     const startersPlayersAnchor = await page.locator('.e1ugt93g0 div > a').all()
     const benchPlayersAnchor = await page.locator('.e1ymsyw60:nth-child(8) ul li a').all()
 
@@ -95,9 +97,10 @@ export async function getRoundMatches(page: PlaywrightPage) {
           stats: playerStats
         })
       }
-
       await page.getByRole('button').and(page.getByText('done')).click()
     }
+    console.log(`${teams[0]} vs ${teams[1]} matchweek ${data.matchWeek} stats collected.`)
+    console.log(`${++matchesFetched} / ${totalMatches} Matches collected.`)
   }
 
 

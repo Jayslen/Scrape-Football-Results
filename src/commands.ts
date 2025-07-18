@@ -43,12 +43,15 @@ export class Commands {
 
     const roundStart = round ?? from
     const roundEnd = round ?? to
+    const totalRounds = roundEnd - roundStart + 1
+
+    console.log(`Fetching ${round ? `round ${round}` : `${totalRounds}`} for ${leagueSelected.path} in season ${season}... \nTotal matches to Fetch: ${totalRounds * 10}`)
 
     let footmobPage = `https://www.fotmob.com/leagues/${leagueSelected.id}/matches/${leagueSelected.path}?season=${season}&group=by-round`
 
     for (let i = roundStart; i <= roundEnd; i++) {
       await this.page.goto(footmobPage + `&round=${i - 1}`, { waitUntil: 'load' })
-      const results = await getRoundMatches(this.page)
+      const results = await getRoundMatches({ page: this.page, totalMatches: totalRounds * 10 })
 
       try {
         await writeData({
@@ -81,11 +84,15 @@ export class Commands {
     const url = `https://www.fotmob.com/leagues/${leagueSelected.id}/table/${leagueSelected.path}`
 
     try {
+      await this.page.goto(url, { waitUntil: 'load' })
 
-      this.page.goto(url, { waitUntil: 'load' })
-      const teamsLinks: string[] = await this.page.$$eval('.eo46u7w0 > a', (links) => links.map(link => (link as HTMLAnchorElement).href))
-
+      const teamsLinks: string[] = await this.page.$$eval('.eo46u7w0 > a', (links) =>
+        links.map(link => (link as HTMLAnchorElement).href)
+      )
       const teams: Teams = []
+      let teamsFetched = 0
+
+      console.log(`Fetching teams for ${leagueSelected.path}...`)
       for (const teamLink of teamsLinks) {
         await this.page.goto(teamLink, { waitUntil: 'load' })
 
@@ -115,6 +122,9 @@ export class Commands {
             marketValue: marketValue.innerText.replace('€', '').replace(/,/g, '')
           }
         }))
+
+        console.log(`Fetched ${teamName} players.`)
+        console.log(`${++teamsFetched} / ${teamsLinks.length} Teams collected.`)
 
         teams.push({ teamName, players: players.flat(), stadium })
       }
