@@ -1,3 +1,5 @@
+import { LeaguesAvailable } from "@customTypes/global"
+
 export const statMappings = {
     accurate_passes: { baseKey: 'passes', successKey: 'successful', failKey: 'missed' },
     shots_on_target: { baseKey: 'shots', successKey: 'on_target', failKey: 'off_target' },
@@ -29,3 +31,8 @@ export const TEAM_ELEMENT_SELECTORS = {
     __team: ".eptdz4j1",
     __playersTableRows: "table tbody tr"
 }
+
+export const LEAGUES_AVAILABLE: LeaguesAvailable = [
+    { acrom: 'pl', path: 'premier-league', id: 47 },
+    { acrom: 'laliga', path: 'laliga', id: 87 }
+]

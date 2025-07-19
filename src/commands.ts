@@ -1,19 +1,17 @@
-import { chromium, Page, Browser } from 'playwright'
+import { chromium } from 'playwright'
 import { getRoundMatches } from './utils/roundMatches.js'
 import { writeData } from './utils/writeFiles.js'
 import { blockExtraResources } from './utils/blockExtraResourses.js'
-import { League, LeaguesAvailable, Player, RoundSchema, Teams } from '@customTypes/global'
 import { getTeams } from './utils/fetchTeams.js'
+import { LEAGUES_AVAILABLE } from './utils/constants.js'
+import { League, LeaguesAvailable, PageInstance, BrowserInstance, RoundSchema } from '@customTypes/global'
 
 export class Commands {
   leagues: LeaguesAvailable
-  browser: Browser | undefined
-  page: Page | undefined
+  browser: BrowserInstance | undefined
+  page: PageInstance | undefined
   constructor() {
-    this.leagues = [
-      { acrom: 'pl', path: 'premier-league', id: 47 },
-      { acrom: 'laliga', path: 'laliga', id: 87 }
-    ]
+    this.leagues = LEAGUES_AVAILABLE
   }
 
   async init() {

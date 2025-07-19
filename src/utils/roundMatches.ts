@@ -1,6 +1,6 @@
-import { PlaywrightPage, MatchDetails, MatchGoals, Goals, PlayerStats } from "@customTypes/global"
-import { statMappings } from './consts.js'
-import { MATCH_ELEMENT_SELECTORS } from './consts.js'
+import { PageInstance, MatchDetails, MatchGoals, Goals, PlayerStats } from "@customTypes/global"
+import { statMappings } from './constants.js'
+import { MATCH_ELEMENT_SELECTORS } from './constants.js'
 
 const { __matchAnchors,
   __league,
@@ -14,7 +14,7 @@ const { __matchAnchors,
   __playerStatsPopup,
   __platerStats } = MATCH_ELEMENT_SELECTORS
 
-export async function getRoundMatches(input: { page: PlaywrightPage, totalMatches: number }) {
+export async function getRoundMatches(input: { page: PageInstance, totalMatches: number }) {
   const { page, totalMatches } = input
   const data: MatchDetails = { league: '', matchWeek: '', matches: [] }
   let matchesFetched = 0

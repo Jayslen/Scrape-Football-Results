@@ -7,11 +7,11 @@ import { prettifyError } from 'zod/v4'
 import { validateTeamsSchema } from './schemas/teams.js'
 import { League, LeagueSeason, Options } from '@customTypes/global'
 
-const Actions = await new Commands().init()
+const Actions = new Commands()
 program
-  .name('Scrapping results')
+  .name('Scrape Football Results')
   .version('1.0.0')
-  .description('A CLI application for scrapping data for footmob')
+  .description('⚽ Welcome to Scrape Football Results! ⚽\n Get the latest scores and match data from your favorite leagues.')
 
 program
   .command('round <league> <season>')
@@ -20,7 +20,6 @@ program
   .option('-f, --from <number>', 'Define the start round')
   .option('-t, --to <number>', 'Define limit round')
   .action(async (league: League, season: LeagueSeason, options) => {
-
     const modifiedOptions: Options = Object.fromEntries(
       Object.entries(options).map(([key, value]) => {
         if (value) {
@@ -32,10 +31,12 @@ program
 
     const { success, data, error } = valiateRoundSchema({ league, season, options: modifiedOptions })
 
+    console.log(success)
     if (!success) {
       console.error(prettifyError(error))
-      return
+      process.exit(1)
     }
+    await Actions.init()
     await Actions.rounds({ ...data })
   })
 
@@ -45,8 +46,9 @@ program.command('teams <league>')
     const { success, data, error } = validateTeamsSchema(league)
     if (!success) {
       console.error(prettifyError(error))
-      return
+      process.exit(1)
     }
+    await Actions.init()
     await Actions.teams(data)
   })
 

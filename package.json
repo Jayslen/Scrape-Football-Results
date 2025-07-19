@@ -5,10 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npx tsx ./src/index.ts",
     "build": "tsc"
   },
   "bin": {
-    "futr": "./dist/index.js"
+    "sfr": "./dist/index.js"
   },
   "keywords": [],
   "author": "",

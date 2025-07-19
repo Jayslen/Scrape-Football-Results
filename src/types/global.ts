@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { teamsSchema } from 'src/schemas/teams.js'
 import { roundSchema } from '../schemas/match.js'
-import { Page } from 'playwright'
+import { Page, Browser } from 'playwright'
 
 export type LeagueSeason = `${string}-${string}`
 export type Options = {
@@ -13,7 +13,8 @@ export type League = "pl" | "laliga"
 export type LeaguesAvailable = { acrom: League; path: string; id: number }[]
 export type RoundSchema = z.infer<typeof roundSchema>
 export type TeamsSchema = z.infer<typeof teamsSchema>
-export type PlaywrightPage = Page
+export type PageInstance = Page
+export type BrowserInstance = Browser | undefined
 
 export type Player = {
     name: string

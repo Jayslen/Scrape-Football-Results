@@ -1,9 +1,9 @@
-import { Player, PlaywrightPage, Teams } from "@customTypes/global"
-import { TEAM_ELEMENT_SELECTORS } from './consts.js'
+import { Player, PageInstance, Teams } from "@customTypes/global"
+import { TEAM_ELEMENT_SELECTORS } from './constants.js'
 
 const { __teamsAnchor, __stadium, __team, __playersTableRows } = TEAM_ELEMENT_SELECTORS
 
-export async function getTeams(input: { page: PlaywrightPage, url: string, leagueName: string }) {
+export async function getTeams(input: { page: PageInstance, url: string, leagueName: string }) {
     const { page, url, leagueName } = input
 
     await page.goto(url, { waitUntil: 'load' })
