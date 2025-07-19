@@ -3,6 +3,7 @@ import { getRoundMatches } from './utils/roundMatches.js'
 import { writeData } from './utils/writeFiles.js'
 import { blockExtraResources } from './utils/blockExtraResourses.js'
 import { League, LeaguesAvailable, Player, RoundSchema, Teams } from '@customTypes/global'
+import { getTeams } from './utils/fetchTeams.js'
 
 export class Commands {
   leagues: LeaguesAvailable
@@ -84,50 +85,7 @@ export class Commands {
     const url = `https://www.fotmob.com/leagues/${leagueSelected.id}/table/${leagueSelected.path}`
 
     try {
-      await this.page.goto(url, { waitUntil: 'load' })
-
-      const teamsLinks: string[] = await this.page.$$eval('.eo46u7w0 > a', (links) =>
-        links.map(link => (link as HTMLAnchorElement).href)
-      )
-      const teams: Teams = []
-      let teamsFetched = 0
-
-      console.log(`Fetching teams for ${leagueSelected.path}...`)
-      for (const teamLink of teamsLinks) {
-        await this.page.goto(teamLink, { waitUntil: 'load' })
-
-        // Find a way to improve the stadium data extraction
-        const stadiumData = await this.page.$eval('.e1vbwb212', el => (el as HTMLElement).innerText.trim().split('\n'))
-        const stadium = {
-          name: stadiumData[0],
-          capacity: stadiumData[2],
-          yearOpened: stadiumData[4],
-          surface: stadiumData[6]
-        }
-        const teamName = await this.page.$eval('.eptdz4j1', el => (el as HTMLElement).innerText.trim())
-
-        await this.page.getByRole('link').and(this.page.getByText('Squad')).click()
-
-        await this.page.waitForSelector('table', { timeout: 10000 })
-
-        const players: Player = await this.page.$$eval('table tbody tr', rows => rows.map((row) => {
-          const [name, positions, country, shirt, age, height, marketValue] = Array.from(row.querySelectorAll('td'))
-          return {
-            name: name.innerText.split('\n')[0],
-            positions: positions.innerText.split(', '),
-            country: country.innerText,
-            shirt: shirt.innerText ?? null,
-            age: Number(age.innerText),
-            height: Number(height.innerText.replace('cm', '')),
-            marketValue: marketValue.innerText.replace('€', '').replace(/,/g, '')
-          }
-        }))
-
-        console.log(`Fetched ${teamName} players.`)
-        console.log(`${++teamsFetched} / ${teamsLinks.length} Teams collected.`)
-
-        teams.push({ teamName, players: players.flat(), stadium })
-      }
+      const teams = await getTeams({ page: this.page, url, leagueName: leagueSelected.path })
 
       writeData({
         data: teams,

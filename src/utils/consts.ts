@@ -22,3 +22,10 @@ export const MATCH_ELEMENT_SELECTORS = {
     __playerStatsPopup: ".e123zo9c9",
     __platerStats: ".e123zo9c10 .e123zo9c2 li:not(:first-child)",
 }
+
+export const TEAM_ELEMENT_SELECTORS = {
+    __teamsAnchor: ".eo46u7w0 > a",
+    __stadium: ".e1vbwb212",
+    __team: ".eptdz4j1",
+    __playersTableRows: "table tbody tr"
+}
