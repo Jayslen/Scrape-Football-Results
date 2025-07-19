@@ -1,8 +1,18 @@
 import { PlaywrightPage, MatchDetails, MatchGoals, Goals, PlayerStats } from "@customTypes/global"
 import { statMappings } from './consts.js'
-import { SELECTORS } from './elementsSelectors.js'
+import { MATCH_ELEMENT_SELECTORS } from './consts.js'
 
-const { __matchAnchors, __league, __matchWeek, __teams, __goalsList, __matchDetails, __matchStatus, __startersPlayersAnchor, __benchPlayersAnchor, __playerStatsPopup, __platerStats } = SELECTORS
+const { __matchAnchors,
+  __league,
+  __matchWeek,
+  __teams,
+  __goalsList,
+  __matchDetails,
+  __matchStatus,
+  __startersPlayersAnchor,
+  __benchPlayersAnchor,
+  __playerStatsPopup,
+  __platerStats } = MATCH_ELEMENT_SELECTORS
 
 export async function getRoundMatches(input: { page: PlaywrightPage, totalMatches: number }) {
   const { page, totalMatches } = input
@@ -16,7 +26,7 @@ export async function getRoundMatches(input: { page: PlaywrightPage, totalMatche
   )
 
   data.league = await page.locator(__league).innerText()
-  data.matchWeek = (await page.locator('.css-bp2mp7').innerText()).split(' ').at(-1)
+  data.matchWeek = (await page.locator(__matchWeek).innerText()).split(' ').at(-1)
 
 
   for (const matchLink of matchLinks) {
