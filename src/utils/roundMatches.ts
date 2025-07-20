@@ -14,10 +14,10 @@ const { __matchAnchors,
   __playerStatsPopup,
   __platerStats } = MATCH_ELEMENT_SELECTORS
 
-export async function getRoundMatches(input: { page: PageInstance, totalMatches: number }) {
+export async function getRoundMatches(input: { page: PageInstance, totalMatches: number, matchesFetched: number }) {
   const { page, totalMatches } = input
   const data: MatchDetails = { league: '', matchWeek: '', matches: [] }
-  let matchesFetched = 0
+  let { matchesFetched } = input
 
   const matchLinks = await page.$$eval(__matchAnchors,
     links => {
@@ -117,5 +117,5 @@ export async function getRoundMatches(input: { page: PageInstance, totalMatches:
   }
 
 
-  return data
+  return { results: data, updateMatchesFetched: matchesFetched }
 }

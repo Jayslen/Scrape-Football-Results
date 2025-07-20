@@ -48,10 +48,13 @@ export class Commands {
 
     let footmobPage = `https://www.fotmob.com/leagues/${leagueSelected.id}/matches/${leagueSelected.path}?season=${season}&group=by-round`
 
+    let matchesFetched = 0
+
     for (let i = roundStart; i <= roundEnd; i++) {
       await this.page.goto(footmobPage + `&round=${i - 1}`, { waitUntil: 'load' })
-      const results = await getRoundMatches({ page: this.page, totalMatches: totalRounds * 10 })
+      const { results, updateMatchesFetched } = await getRoundMatches({ page: this.page, totalMatches: totalRounds * 10, matchesFetched })
 
+      matchesFetched = updateMatchesFetched
       try {
         await writeData({
           data: results,
@@ -61,10 +64,8 @@ export class Commands {
       } catch (Error) {
         console.error('Error writing data:', Error)
       }
-      finally {
-        await this.browser.close()
-      }
     }
+    await this.browser.close()
   }
 
   async teams(league: League) {
