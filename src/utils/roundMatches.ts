@@ -69,6 +69,10 @@ export async function getRoundMatches(input: { page: PageInstance, totalMatches:
     for (const $a of allPlayers) {
       const iteration = allPlayers.indexOf($a) + 1
 
+      // some players don't have stats, so we skip them
+      const playerLink = await $a.getAttribute('href')
+      if (!playerLink?.includes(':tab=facts')) continue
+
       await $a.click()
       await page.waitForSelector(__playerStatsPopup, { state: 'visible' })
 

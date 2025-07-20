@@ -31,7 +31,6 @@ program
 
     const { success, data, error } = valiateRoundSchema({ league, season, options: modifiedOptions })
 
-    console.log(success)
     if (!success) {
       console.error(prettifyError(error))
       process.exit(1)
