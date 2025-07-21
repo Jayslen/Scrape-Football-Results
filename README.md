@@ -2,6 +2,9 @@
 
 Scrape Football Results is a command-line application built with Node.js that allows users to effortlessly fetch football match results and team data from their favorite leagues using web scrapping. With a single command, the app retrieves information from [Fotmob](https://www.fotmob.com/) and automatically saves it in a structured JSON file for easy access and further processing.
 
+>[!important]
+> Node version 22.12.0
+
 > [!NOTE]
 > Currently, only La Liga and the Premier League are supported.
 >
