@@ -70,3 +70,13 @@ Install with npm
   npm link
 ```
 With this the progrom should run with the command `sfr` in the Command line
+
+### Development
+Run this code to compile the js code
+```bash
+npm run build
+```
+To run the typescript code withou compile it 
+```bash
+  npx tsx ./src/index.ts [command] [opntions]
+```
