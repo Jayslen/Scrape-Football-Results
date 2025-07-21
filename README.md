@@ -4,6 +4,8 @@ Scrape Football Results is a command-line application built with Node.js that al
 
 >[!important]
 > Node version 22.12.0
+>
+> Typescript version 5.8.3
 
 > [!NOTE]
 > Currently, only La Liga and the Premier League are supported.
