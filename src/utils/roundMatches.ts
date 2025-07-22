@@ -40,7 +40,7 @@ export async function getRoundMatches(input: { page: PageInstance, totalMatches:
         ul.querySelectorAll('li').forEach((li: HTMLElement) => {
           const scorer = li.querySelector('a span:first-child')?.textContent?.trim() || ''
           const minute = li.querySelector('a span:nth-child(2)')?.textContent?.trim() || ''
-          goals.push({ minute: minute.replaceAll('\'', '').split(', '), scorer })
+          goals.push({ scorer, minute: minute.replaceAll('\'', '').split(', ') })
         })
         return goals
       })

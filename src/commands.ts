@@ -44,9 +44,9 @@ export class Commands {
     const roundEnd = round ?? to
     const totalRounds = roundEnd - roundStart + 1
 
-    console.log(`Fetching ${round ? `round ${round}` : `${totalRounds}`} for ${leagueSelected.path} in season ${season}... \nTotal matches to Fetch: ${totalRounds * 10}`)
+    console.log(`Fetching ${round ? `round ${round}` : `${totalRounds}`} for ${leagueSelected.name} in season ${season}... \nTotal matches to Fetch: ${totalRounds * 10}`)
 
-    let footmobPage = `https://www.fotmob.com/leagues/${leagueSelected.id}/matches/${leagueSelected.path}?season=${season}&group=by-round`
+    let footmobPage = `https://www.fotmob.com/leagues/${leagueSelected.id}/matches/${leagueSelected.acrom}?season=${season}&group=by-round`
 
     let matchesFetched = 0
 
@@ -58,8 +58,8 @@ export class Commands {
       try {
         await writeData({
           data: results,
-          dir: `matches/${leagueSelected.path}/${season}`,
-          fileName: `/${leagueSelected.path}-week-${results.matchWeek}.json`
+          dir: `matches/${leagueSelected.acrom}/${season}`,
+          fileName: `/${leagueSelected.acrom}-week-${results.matchWeek}.json`
         })
       } catch (Error) {
         console.error('Error writing data:', Error)
@@ -81,15 +81,15 @@ export class Commands {
       process.exit(1)
     }
 
-    const url = `https://www.fotmob.com/leagues/${leagueSelected.id}/table/${leagueSelected.path}`
+    const url = `https://www.fotmob.com/leagues/${leagueSelected.id}/table/${leagueSelected.acrom}`
 
     try {
-      const teams = await getTeams({ page: this.page, url, leagueName: leagueSelected.path })
+      const teams = await getTeams({ page: this.page, url, leagueName: leagueSelected.name })
 
       writeData({
         data: teams,
         dir: 'teams',
-        fileName: `/${leagueSelected.path}-teams.json`
+        fileName: `/${leagueSelected.acrom}-teams.json`
       })
     } catch (error) {
       console.error('Error fetching teams:', error)

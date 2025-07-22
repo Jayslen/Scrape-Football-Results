@@ -33,6 +33,6 @@ export const TEAM_ELEMENT_SELECTORS = {
 }
 
 export const LEAGUES_AVAILABLE: LeaguesAvailable = [
-    { acrom: 'premier-league', path: 'premier-league', id: 47 },
-    { acrom: 'laliga', path: 'laliga', id: 87 }
+    { acrom: 'premier-league', name: 'Premier League', id: 47 },
+    { acrom: 'laliga', name: 'La Liga', id: 87 }
 ]

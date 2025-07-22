@@ -11,7 +11,10 @@ export async function getTeams(input: { page: PageInstance, url: string, leagueN
     const teamsLinks: string[] = await page.$$eval(__teamsAnchor, (links) =>
         links.map(link => (link as HTMLAnchorElement).href)
     )
-    const teams: Teams = []
+    const teamsData: Teams = {
+        league: leagueName,
+        teams: []
+    }
     let teamsFetched = 0
 
     console.log(`Fetching teams for ${leagueName}...`)
@@ -48,7 +51,7 @@ export async function getTeams(input: { page: PageInstance, url: string, leagueN
         console.log(`Fetched ${teamName} players.`)
         console.log(`${++teamsFetched} / ${teamsLinks.length} Teams collected.`)
 
-        teams.push({ teamName, players: players.flat(), stadium })
+        teamsData.teams.push({ teamName, players: players.flat(), stadium })
     }
-    return teams
+    return teamsData
 }

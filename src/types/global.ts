@@ -10,7 +10,7 @@ export type Options = {
     to?: number | undefined
 }
 export type League = "premier-league" | "laliga"
-export type LeaguesAvailable = { acrom: League; path: string; id: number }[]
+export type LeaguesAvailable = { acrom: League; name: string; id: number }[]
 export type RoundSchema = z.infer<typeof roundSchema>
 export type TeamsSchema = z.infer<typeof teamsSchema>
 export type PageInstance = Page
@@ -39,7 +39,10 @@ export type Team = {
     stadium: Stadium
 }
 
-export type Teams = Team[]
+export type Teams = {
+    league: string,
+    teams: Team[]
+}
 
 export type Goals = {
     scorer?: string
