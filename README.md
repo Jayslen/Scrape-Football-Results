@@ -14,6 +14,7 @@ Scrape Football Results is a command-line application built with Node.js that al
 > 
 > - premier-league
 > - laliga
+> - serie (serie A)
 
 ## Tech Stack
 - NodeJS
