@@ -1,6 +1,6 @@
 import z from 'zod'
 import { League, RoundSchema } from '@customTypes/global'
-import { LEAGUES_AVAILABLE_ENUM } from 'src/utils/constants.js'
+import { LEAGUES_AVAILABLE_ENUM } from '../utils/constants.js'
 
 export const roundSchema = z.object({
   season: z.string().regex(/^\d{4}-\d{4}$/),
