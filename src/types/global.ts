@@ -9,7 +9,7 @@ export type Options = {
     from?: number | undefined
     to?: number | undefined
 }
-export type League = "premier-league" | "laliga" | "serie"
+export type League = "premier-league" | "laliga" | "serie" | "bundesliga"
 export type LeaguesAvailable = { acrom: League; name: string; id: number }[]
 export type RoundSchema = z.infer<typeof roundSchema>
 export type TeamsSchema = z.infer<typeof teamsSchema>

@@ -36,4 +36,7 @@ export const LEAGUES_AVAILABLE: LeaguesAvailable = [
     { acrom: 'premier-league', name: 'Premier League', id: 47 },
     { acrom: 'laliga', name: 'La Liga', id: 87 },
     { acrom: 'serie', name: 'Serie A', id: 55 },
+    { acrom: 'bundesliga', name: 'Bundesliga', id: 54 },
 ]
+
+export const LEAGUES_AVAILABLE_ENUM = LEAGUES_AVAILABLE.map(league => league.acrom)
