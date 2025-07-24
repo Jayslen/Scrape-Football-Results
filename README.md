@@ -8,13 +8,14 @@ Scrape Football Results is a command-line application built with Node.js that al
 > Typescript version 5.8.3
 
 > [!NOTE]
-> Currently, only La Liga and the Premier League are supported.
+> Currently, only La Liga, Premier League, Seria A and Bundesliga are supported.
 >
 > When specifying a league as an argument, use the following formats:
 > 
 > - premier-league
 > - laliga
 > - serie (serie A)
+> - bundesliga
 
 ## Tech Stack
 - NodeJS
@@ -68,7 +69,6 @@ Install with npm
   git clone https://github.com/Jayslen/Scrape-Football-Results.git
   npm install
   npm run build
-  npm link
 ```
 With this the progrom should run with the command `sfr` in the Command line
 
@@ -80,4 +80,8 @@ npm run build
 To run the typescript code withou compile it 
 ```bash
   npx tsx ./src/index.ts [command] [opntions]
+```
+or:
+```bash
+  npm run dev [command] [options]
 ```
