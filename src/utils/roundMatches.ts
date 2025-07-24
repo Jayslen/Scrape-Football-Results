@@ -12,7 +12,8 @@ const { __matchAnchors,
   __startersPlayersAnchor,
   __benchPlayersAnchor,
   __playerStatsPopup,
-  __platerStats } = MATCH_ELEMENT_SELECTORS
+  __platerStats,
+  __doneButton } = MATCH_ELEMENT_SELECTORS
 
 export async function getRoundMatches(input: { page: PageInstance, totalMatches: number, matchesFetched: number }) {
   const { page, totalMatches } = input
@@ -114,7 +115,7 @@ export async function getRoundMatches(input: { page: PageInstance, totalMatches:
           stats: playerStats
         })
       }
-      await page.getByRole('button').and(page.getByText('done')).click()
+      await page.locator(__doneButton).click()
     }
     console.log(`${teams[0]} vs ${teams[1]} matchweek ${data.matchWeek} stats collected.`)
     console.log(`${++matchesFetched} / ${totalMatches} Matches collected.`)

@@ -16,7 +16,7 @@ export class Commands {
 
   async init() {
     if (!this.browser) {
-      this.browser = await chromium.launch({ headless: false })
+      this.browser = await chromium.launch({ headless: true })
       const context = await this.browser.newContext()
       this.page = await context.newPage()
       blockExtraResources(this.page)

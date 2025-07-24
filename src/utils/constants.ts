@@ -23,6 +23,7 @@ export const MATCH_ELEMENT_SELECTORS = {
     __benchPlayersAnchor: ".e1ymsyw60:nth-child(8) ul li a",
     __playerStatsPopup: ".e123zo9c9",
     __platerStats: ".e123zo9c10 .e123zo9c2 li:not(:first-child)",
+    __doneButton: ".e123zo9c11"
 }
 
 export const TEAM_ELEMENT_SELECTORS = {
