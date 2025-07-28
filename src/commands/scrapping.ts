@@ -1,12 +1,12 @@
 import { chromium } from 'playwright'
-import { getRoundMatches } from './utils/roundMatches.js'
-import { writeData } from './utils/writeFiles.js'
-import { blockExtraResources } from './utils/blockExtraResourses.js'
-import { getTeams } from './utils/fetchTeams.js'
-import { LEAGUES_AVAILABLE } from './utils/constants.js'
+import { getRoundMatches } from '../utils/roundMatches.js'
+import { writeData } from '../utils/writeFiles.js'
+import { blockExtraResources } from '../utils/blockExtraResourses.js'
+import { getTeams } from '../utils/fetchTeams.js'
+import { LEAGUES_AVAILABLE } from '../config.js'
 import { League, LeaguesAvailable, PageInstance, BrowserInstance, RoundSchema } from '@customTypes/global'
 
-export class Commands {
+export class ScrapeDataCommands {
   leagues: LeaguesAvailable
   browser: BrowserInstance | undefined
   page: PageInstance | undefined

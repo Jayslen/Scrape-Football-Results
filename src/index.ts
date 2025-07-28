@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
 import { program } from 'commander'
-import { Commands } from './commands.js'
+import { ScrapeDataCommands } from './commands/scrapping.js'
 import { valiateRoundSchema } from './schemas/match.js'
 import { prettifyError } from 'zod/v4'
 import { validateTeamsSchema } from './schemas/teams.js'
 import { League, LeagueSeason, Options } from '@customTypes/global'
 
-const Actions = new Commands()
+const ScrapeActions = new ScrapeDataCommands()
 program
   .name('Scrape Football Results')
   .version('1.0.0')
@@ -35,8 +35,8 @@ program
       console.error(prettifyError(error))
       process.exit(1)
     }
-    await Actions.init()
-    await Actions.rounds({ ...data })
+    await ScrapeActions.init()
+    await ScrapeActions.rounds({ ...data })
   })
 
 program.command('teams <league>')
@@ -47,8 +47,8 @@ program.command('teams <league>')
       console.error(prettifyError(error))
       process.exit(1)
     }
-    await Actions.init()
-    await Actions.teams(data)
+    await ScrapeActions.init()
+    await ScrapeActions.teams(data)
   })
 
 

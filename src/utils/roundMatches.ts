@@ -1,6 +1,6 @@
 import { PageInstance, MatchDetails, MatchGoals, Goals, PlayerStats } from "@customTypes/global"
-import { statMappings } from './constants.js'
-import { MATCH_ELEMENT_SELECTORS } from './constants.js'
+import { statMappings } from '../config.js'
+import { MATCH_ELEMENT_SELECTORS } from '../config.js'
 
 const { __matchAnchors,
   __league,
