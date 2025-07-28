@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 
 import { program } from 'commander'
+import { prettifyError } from 'zod/v4'
+import { LEAGUES_AVAILABLE } from './config.js'
 import { ScrapeDataCommands } from './commands/scrapping.js'
 import { valiateRoundSchema } from './schemas/match.js'
-import { prettifyError } from 'zod/v4'
 import { validateTeamsSchema } from './schemas/teams.js'
+import { initializeBrowser } from './utils/initializeBrowser.js'
 import { League, LeagueSeason, Options } from '@customTypes/global'
 
-const ScrapeActions = new ScrapeDataCommands()
 program
   .name('Scrape Football Results')
   .version('1.0.0')
@@ -29,26 +30,32 @@ program
       })
     )
 
-    const { success, data, error } = valiateRoundSchema({ league, season, options: modifiedOptions })
+    const { success, data: roundData, error } = valiateRoundSchema({ league, season, options: modifiedOptions })
 
     if (!success) {
       console.error(prettifyError(error))
       process.exit(1)
     }
-    await ScrapeActions.init()
-    await ScrapeActions.rounds({ ...data })
+    await ScrapeDataCommands.rounds({
+      RoundSchema: roundData,
+      initializeBrowser,
+      leaguesAvailable: LEAGUES_AVAILABLE
+    })
   })
 
 program.command('teams <league>')
   .description('Fetch teams for a specific league')
   .action(async (league: League) => {
-    const { success, data, error } = validateTeamsSchema(league)
+    const { success, data: leagueSelected, error } = validateTeamsSchema(league)
     if (!success) {
       console.error(prettifyError(error))
       process.exit(1)
     }
-    await ScrapeActions.init()
-    await ScrapeActions.teams(data)
+    await ScrapeDataCommands.teams({
+      league: leagueSelected,
+      initializeBrowser,
+      leaguesAvailable: LEAGUES_AVAILABLE
+    })
   })
 
 

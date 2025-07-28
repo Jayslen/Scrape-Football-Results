@@ -1,44 +1,21 @@
-import { chromium } from 'playwright'
+import { League, LeaguesAvailable, RoundSchema } from '@customTypes/global'
 import { getRoundMatches } from '../utils/roundMatches.js'
 import { writeData } from '../utils/writeFiles.js'
-import { blockExtraResources } from '../utils/blockExtraResourses.js'
 import { getTeams } from '../utils/fetchTeams.js'
-import { LEAGUES_AVAILABLE } from '../config.js'
-import { League, LeaguesAvailable, PageInstance, BrowserInstance, RoundSchema } from '@customTypes/global'
 
 export class ScrapeDataCommands {
-  leagues: LeaguesAvailable
-  browser: BrowserInstance | undefined
-  page: PageInstance | undefined
-  constructor() {
-    this.leagues = LEAGUES_AVAILABLE
-  }
+  static async rounds(input: { RoundSchema: RoundSchema, initializeBrowser: Function, leaguesAvailable: LeaguesAvailable }) {
+    const { RoundSchema, initializeBrowser, leaguesAvailable } = input
+    const { season, league, options: { round, from = 1, to = 38 } } = RoundSchema
 
-  async init() {
-    if (!this.browser) {
-      this.browser = await chromium.launch({ headless: true })
-      const context = await this.browser.newContext()
-      this.page = await context.newPage()
-      blockExtraResources(this.page)
-    } else {
-      console.warn('Browser is already initialized.')
-    }
-    return this
-  }
-
-  async rounds(data: RoundSchema) {
-    const { season, league, options: { round, from = 1, to = 38 } } = data
-    const leagueSelected = this.leagues.find((data) => data.acrom === league)
+    const leagueSelected = leaguesAvailable.find((data) => data.acrom === league)
 
     if (!leagueSelected) {
       console.error(`League ${league} not found.`)
       process.exit(1)
     }
 
-    if (this.browser === undefined || this.page === undefined) {
-      console.error('Browser or page is not initialized. Try again')
-      process.exit(1)
-    }
+    const { browser, page } = await initializeBrowser()
 
     const roundStart = round ?? from
     const roundEnd = round ?? to
@@ -51,8 +28,8 @@ export class ScrapeDataCommands {
     let matchesFetched = 0
 
     for (let i = roundStart; i <= roundEnd; i++) {
-      await this.page.goto(footmobPage + `&round=${i - 1}`, { waitUntil: 'load' })
-      const { results, updateMatchesFetched } = await getRoundMatches({ page: this.page, totalMatches: totalRounds * 10, matchesFetched })
+      await page.goto(footmobPage + `&round=${i - 1}`, { waitUntil: 'load' })
+      const { results, updateMatchesFetched } = await getRoundMatches({ page, totalMatches: totalRounds * 10, matchesFetched })
 
       matchesFetched = updateMatchesFetched
       try {
@@ -65,26 +42,24 @@ export class ScrapeDataCommands {
         console.error('Error writing data:', Error)
       }
     }
-    await this.browser.close()
+    await browser.close()
   }
 
-  async teams(league: League) {
-    const leagueSelected = this.leagues.find((data) => data.acrom === league)
+  static async teams(input: { league: League, initializeBrowser: Function, leaguesAvailable: LeaguesAvailable }) {
+    const { league, leaguesAvailable, initializeBrowser } = input
+    const leagueSelected = leaguesAvailable.find((data) => data.acrom === league)
 
     if (!leagueSelected) {
       console.error(`League ${league} not found.`)
       process.exit(1)
     }
 
-    if (this.browser === undefined || this.page === undefined) {
-      console.error('Browser or page is not initialized. Try again')
-      process.exit(1)
-    }
+    const { browser, page } = await initializeBrowser()
 
     const url = `https://www.fotmob.com/leagues/${leagueSelected.id}/table/${leagueSelected.acrom}`
 
     try {
-      const teams = await getTeams({ page: this.page, url, leagueName: leagueSelected.name })
+      const teams = await getTeams({ page, url, leagueName: leagueSelected.name })
 
       writeData({
         data: teams,
@@ -94,7 +69,7 @@ export class ScrapeDataCommands {
     } catch (error) {
       console.error('Error fetching teams:', error)
     } finally {
-      await this.browser.close()
+      await browser.close()
     }
   }
 }
