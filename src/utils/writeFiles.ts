@@ -1,6 +1,7 @@
 import path from 'node:path'
 import fs from 'node:fs/promises'
-import { MatchDetails, Teams } from '@customTypes/global'
+import { Teams } from '@customTypes/teams'
+import { MatchDetails } from '@customTypes/matches'
 
 export async function writeData(filePaths: { data: MatchDetails | Teams, dir: string, fileName: string }) {
   const { data, dir, fileName } = filePaths

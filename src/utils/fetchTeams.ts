@@ -1,5 +1,6 @@
-import { Player, PageInstance, Teams } from "@customTypes/global"
 import { TEAM_ELEMENT_SELECTORS } from '../config.js'
+import { PageInstance } from "@customTypes/core"
+import { Player, Teams } from '@customTypes/teams'
 
 const { __teamsAnchor, __stadium, __team, __playersTableRows } = TEAM_ELEMENT_SELECTORS
 

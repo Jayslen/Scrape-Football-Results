@@ -7,7 +7,7 @@ import { ScrapeDataCommands } from './commands/scrapping.js'
 import { valiateRoundSchema } from './schemas/match.js'
 import { validateTeamsSchema } from './schemas/teams.js'
 import { initializeBrowser } from './utils/initializeBrowser.js'
-import { League, LeagueSeason, Options } from '@customTypes/global'
+import { League, LeagueSeason, Options } from '@customTypes/core'
 
 program
   .name('Scrape Football Results')

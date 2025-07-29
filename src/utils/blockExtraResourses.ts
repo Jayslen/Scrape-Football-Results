@@ -1,4 +1,4 @@
-import { PageInstance } from '@customTypes/global'
+import { PageInstance } from '@customTypes/core'
 
 export async function blockExtraResources(page: PageInstance) {
   await page.route('**/*', (route) => {

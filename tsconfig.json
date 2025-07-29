@@ -5,7 +5,10 @@
     "baseUrl": ".",
     "noEmitOnError": true, 
     "paths": {
-      "@customTypes/global": ["src/types/global.ts"]
+      "@customTypes/core": ["src/types/core.ts"],
+      "@customTypes/teams": ["src/types/teams.ts"],
+      "@customTypes/matches": ["src/types/matches.ts"],
+      "@customTypes/db": ["src/types/db.ts"],
     },
     "lib": ["DOM", "ESNext"],
   },

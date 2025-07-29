@@ -1,7 +1,8 @@
-import { League, LeaguesAvailable, RoundSchema } from '@customTypes/global'
 import { getRoundMatches } from '../utils/roundMatches.js'
 import { writeData } from '../utils/writeFiles.js'
 import { getTeams } from '../utils/fetchTeams.js'
+import { League, LeaguesAvailable } from '@customTypes/core'
+import { RoundSchema } from '@customTypes/matches'
 
 export class ScrapeDataCommands {
   static async rounds(input: { RoundSchema: RoundSchema, initializeBrowser: Function, leaguesAvailable: LeaguesAvailable }) {

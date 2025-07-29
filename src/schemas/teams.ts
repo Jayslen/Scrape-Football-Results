@@ -1,6 +1,6 @@
 import z from 'zod'
-import { League } from '@customTypes/global'
 import { LEAGUES_AVAILABLE_ENUM } from '../config.js'
+import { League } from '@customTypes/core'
 
 export const teamsSchema = z.enum(LEAGUES_AVAILABLE_ENUM as [League, ...League[]])
 
