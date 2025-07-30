@@ -9,6 +9,7 @@
       "@customTypes/teams": ["src/types/teams.ts"],
       "@customTypes/matches": ["src/types/matches.ts"],
       "@customTypes/db": ["src/types/db.ts"],
+      "@customTypes/browser": ["src/types/browser.ts"]
     },
     "lib": ["DOM", "ESNext"],
   },

@@ -3,9 +3,10 @@ import { writeData } from '../utils/writeFiles.js'
 import { getTeams } from '../utils/fetchTeams.js'
 import { League, LeaguesAvailable } from '@customTypes/core'
 import { RoundSchema } from '@customTypes/matches'
+import { BrowserInstance, PageInstance } from '@customTypes/browser'
 
 export class ScrapeDataCommands {
-  static async rounds(input: { RoundSchema: RoundSchema, initializeBrowser: Function, leaguesAvailable: LeaguesAvailable }) {
+  static async rounds(input: { RoundSchema: RoundSchema, initializeBrowser: () => Promise<{ page: PageInstance, browser: BrowserInstance }>, leaguesAvailable: LeaguesAvailable }) {
     const { RoundSchema, initializeBrowser, leaguesAvailable } = input
     const { season, league, options: { round, from = 1, to = 38 } } = RoundSchema
 
