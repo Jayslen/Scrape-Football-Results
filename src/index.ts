@@ -3,7 +3,7 @@
 import { program } from 'commander'
 import { prettifyError } from 'zod/v4'
 import { LEAGUES_AVAILABLE } from './config.js'
-import { ScrapeDataCommands } from './commands/scrapping.js'
+import { ScrapeDataCommands } from './commands/scrape/scrappingCommands.js'
 import { valiateRoundSchema } from './schemas/match.js'
 import { validateTeamsSchema } from './schemas/teams.js'
 import { initializeBrowser } from './utils/initializeBrowser.js'

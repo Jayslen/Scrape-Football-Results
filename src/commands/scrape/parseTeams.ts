@@ -1,4 +1,4 @@
-import { TEAM_ELEMENT_SELECTORS } from '../config.js'
+import { TEAM_ELEMENT_SELECTORS } from '../../config.js'
 import { PageInstance } from "@customTypes/core"
 import { Player, Teams } from '@customTypes/teams'
 

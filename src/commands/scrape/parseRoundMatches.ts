@@ -1,5 +1,5 @@
-import { statMappings } from '../config.js'
-import { MATCH_ELEMENT_SELECTORS } from '../config.js'
+import { statMappings } from '../../config.js'
+import { MATCH_ELEMENT_SELECTORS } from '../../config.js'
 import { MatchDetails, MatchGoals, Goals, PlayerStats } from "@customTypes/matches";
 import { PageInstance } from "@customTypes/core";
 
