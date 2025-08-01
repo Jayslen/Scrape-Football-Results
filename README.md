@@ -7,6 +7,11 @@ Scrape Football Results is a command-line application built with Node.js that al
 >
 > Typescript version 5.8.3
 
+> [!important]
+> I will be uploading a scrip to create the dababase for you
+> to interact to all the commands that have something to do with load data to a db, once the project is done.
+>
+
 > [!NOTE]
 > Currently, only La Liga, Premier League, Seria A and Bundesliga are supported.
 >
@@ -60,6 +65,9 @@ Fetches the list of teams for a given league.
   - premier-league
   - laliga
 
+`sfr update-db-teams`
+
+Process all the data scraped by the teams command and save it to a MySQL database.
 
 ## Installation
 
