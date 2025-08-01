@@ -1,4 +1,18 @@
-import { LeaguesAvailable } from "@customTypes/global"
+import { LeaguesAvailable } from "@customTypes/core"
+import { InsertDataCommand } from "./commands/teams-insertion/insertionCommands.js"
+import { getExistingValues, insertRows } from "./db/dbStatements.js"
+import { randomUUID } from "crypto"
+import { InsertionConfig } from "src/types/fs/teamsFs.js"
+import { Stadium } from "@customTypes/teams"
+
+process.loadEnvFile()
+
+export const databaseConfig = {
+    host: process.env.HOST,
+    user: process.env.USER,
+    database: process.env.DATABASE,
+    port: process.env.PORT ? parseInt(process.env.PORT, 10) : 3306,
+}
 
 export const statMappings = {
     accurate_passes: { baseKey: 'passes', successKey: 'successful', failKey: 'missed' },
@@ -34,10 +48,10 @@ export const TEAM_ELEMENT_SELECTORS = {
 }
 
 export const LEAGUES_AVAILABLE: LeaguesAvailable = [
-    { acrom: 'premier-league', name: 'Premier League', id: 47 },
-    { acrom: 'laliga', name: 'La Liga', id: 87 },
-    { acrom: 'serie', name: 'Serie A', id: 55 },
-    { acrom: 'bundesliga', name: 'Bundesliga', id: 54 },
+    { acrom: 'premier-league', name: 'Premier League', id: 47, country: 'England' },
+    { acrom: 'laliga', name: 'La Liga', id: 87, country: 'Spain' },
+    { acrom: 'serie', name: 'Serie A', id: 55, country: 'Italy' },
+    { acrom: 'bundesliga', name: 'Bundesliga', id: 54, country: 'Germany' },
 ]
 
 export const LEAGUES_AVAILABLE_ENUM = LEAGUES_AVAILABLE.map(league => league.acrom)

@@ -2,7 +2,7 @@ import { Connection as DBConnection } from 'mysql2/promise'
 
 export type Connection = DBConnection
 
-export type DbDataInsertionParams = {
+export type DbInsertionParams = {
     queriesColumns: string
     queryValues: string[]
     dataInserted: string
