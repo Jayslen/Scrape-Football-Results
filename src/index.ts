@@ -7,6 +7,9 @@ import { ScrapeDataCommands } from './commands/scrape/scrappingCommands.js'
 import { valiateRoundSchema } from './schemas/match.js'
 import { validateTeamsSchema } from './schemas/teams.js'
 import { initializeBrowser } from './utils/initializeBrowser.js'
+import { getTeamsDataFiles } from './loaders/parseTeamsFiles.js'
+import { DB } from './db/dbInstance.js'
+import { InsertDataCommand } from './commands/teams-insertion/insertionCommands.js'
 import { League, LeagueSeason, Options } from '@customTypes/core'
 
 program
@@ -55,6 +58,34 @@ program.command('teams <league>')
       league: leagueSelected,
       initializeBrowser,
       leaguesAvailable: LEAGUES_AVAILABLE
+    })
+  })
+
+program.command('update-db-teams')
+  .description('Insert data from teams files into the database')
+  .action(async () => {
+    const { filesCountries,
+      filesPositions,
+      filesStadiums,
+      stadiumsData,
+      filesTeams,
+      filesTeamsData,
+      filesPlayers,
+      playersData,
+      filesPlayersPosition,
+      playersPositionFullData
+    } = await getTeamsDataFiles()
+    const dbConnection = await DB.initialize()
+    const insertDataCommand = new InsertDataCommand(dbConnection)
+
+    await insertDataCommand.executeAllInsertions({
+      countries: filesCountries,
+      positions: filesPositions,
+      stadiums: { filesStadiums, stadiumsFullData: stadiumsData },
+      teams: { teamsFullData: filesTeamsData, filesTeams },
+      players: { playersFullData: playersData, filesPlayers },
+      playersPositions: { filesPlayersPosition, playersPositionFullData },
+      includeLeagues: true
     })
   })
 
