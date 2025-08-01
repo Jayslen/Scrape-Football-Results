@@ -93,3 +93,11 @@ or:
 ```bash
   npm run dev [command] [options]
 ```
+
+## What i learned.
+
+This is my first project using TypeScript. I've learned a lot throughout the process of building it. While the code might not be perfect and some types may not be well implemented, that’s part of the learning experience.
+
+I've been learning by different sources like blogPost, tuturiales etc.... but the main source was Midudev, here is the content:
+
+[TypeScript - curso desde cero 2023 - by Midudev](https://www.youtube.com/playlist?list=PLUofhDIg_38pNCZe9ptj72exbFjzyePxT)
