@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises'
 import path, { parse } from 'node:path'
-import { saveCacheData } from 'src/utils/saveChache.js'
+import { saveCacheData } from '../utils/saveChache.js'
 import { CacheTeamsFiles, FilesData } from '@customTypes/fs/teams'
 import { Stadium, Teams } from '@customTypes/teams'
 
