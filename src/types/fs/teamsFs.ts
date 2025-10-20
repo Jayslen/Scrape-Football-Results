@@ -1,4 +1,17 @@
+import { InsertDataCommand } from 'src/commands/teams-insertion/insertionCommands.js'
 import { Stadium } from '../teams.js'
+
+export interface InsertionConfig {
+  table: string
+  column: string
+  dataInserted: string
+  queriesColumns: string
+  generateQueryValues: (data: any) => string[]
+  getLocalData: (data: any) => Set<string>
+  useInsertAll?: boolean
+  useInsertRows?: boolean
+  customLogic?: (self: InsertDataCommand, data: any) => Promise<void>
+}
 
 export interface FilesData {
   filesCountries: Set<string>

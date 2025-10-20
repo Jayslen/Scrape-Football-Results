@@ -1,6 +1,18 @@
 import { LeaguesAvailable } from '@customTypes/core'
+import { InsertDataCommand } from './commands/teams-insertion/insertionCommands.js'
+import { getExistingValues, insertRows } from './db/dbStatements.js'
+import { randomUUID } from 'crypto'
+import { Stadium } from '@customTypes/teams'
+import { InsertionConfig } from '@customTypes/fs/teams'
 
 process.loadEnvFile()
+
+export const databaseConfig = {
+  host: process.env.HOST,
+  user: process.env.USER,
+  database: process.env.DATABASE,
+  port: process.env.PORT ? parseInt(process.env.PORT, 10) : 3306,
+}
 
 export const statMappings = {
   accurate_passes: {
