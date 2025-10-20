@@ -30,7 +30,7 @@ export class ScrapeDataCommands {
     let matchesFetched = 0
 
     for (let i = roundStart; i <= roundEnd; i++) {
-      await page.goto(footmobPage + `&round=${i - 1}`, { waitUntil: 'load' })
+    await page.goto(footmobPage + `&round=${i - 1}`, { waitUntil: 'load' })
       const { results, updateMatchesFetched } = await getRoundMatches({ page, totalMatches: totalRounds * 10, matchesFetched })
 
       matchesFetched = updateMatchesFetched

@@ -1,8 +1,8 @@
-import { PageInstance } from '@customTypes/core'
+import { Page, BrowserContext } from 'playwright'
 
-export async function blockExtraResources(page: PageInstance) {
-  await page.route('**/*', (route) => {
-    const blocked = ['image', 'font']
+export async function blockExtraResources(target: Page | BrowserContext) {
+  await target.route('**/*', (route) => {
+    const blocked = ['image', 'font', 'media']
     if (blocked.includes(route.request().resourceType())) {
       route.abort()
     } else {
