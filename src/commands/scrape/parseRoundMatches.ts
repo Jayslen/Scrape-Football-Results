@@ -1,70 +1,133 @@
-import { statMappings } from '../../config.js'
 import { MATCH_ELEMENT_SELECTORS } from '../../config.js'
-import { MatchDetails, MatchGoals, Goals, PlayerStats } from "@customTypes/matches";
-import { PageInstance } from "@customTypes/core";
+import { MatchDetails, MatchGoals, PlayerStats } from '@customTypes/matches'
+import { PageInstance } from '@customTypes/core'
+import { getPlayerStats } from 'src/utils/extractPlayerMatchStats.js'
 
-const { __matchAnchors,
+const {
+  __matchAnchors,
   __league,
   __matchWeek,
   __teams,
-  __goalsList,
+  __goalsEventContainer,
   __matchDetails,
   __matchStatus,
   __startersPlayersAnchor,
   __benchPlayersAnchor,
   __playerStatsPopup,
-  __platerStats,
-  __doneButton } = MATCH_ELEMENT_SELECTORS
+  __doneButton,
+} = MATCH_ELEMENT_SELECTORS
 
-export async function getRoundMatches(input: { page: PageInstance, totalMatches: number, matchesFetched: number }) {
+export async function getRoundMatches(input: {
+  page: PageInstance
+  totalMatches: number
+  matchesFetched: number
+}) {
   const { page, totalMatches } = input
   const data: MatchDetails = { league: '', matchWeek: '', matches: [] }
   let { matchesFetched } = input
 
-  const matchLinks = await page.$$eval(__matchAnchors,
-    links => {
-      return links.map(link => link.getAttribute('href'))
-    }
-  )
+  const matchLinks = await page.$$eval(__matchAnchors, (links) => {
+    return links.map((link) => link.getAttribute('href'))
+  })
 
   data.league = await page.locator(__league).innerText()
-  data.matchWeek = (await page.locator(__matchWeek).innerText()).split(' ').at(-1)
-
+  data.matchWeek = (await page.locator(__matchWeek).innerText())
+    .split(' ')
+    .at(-1)
 
   for (const matchLink of matchLinks) {
     await page.goto(`https://www.fotmob.com${matchLink}`, { waitUntil: 'load' })
     // extract teams
     const teams = await page.locator(__teams).allInnerTexts()
 
-    const matchGoals: MatchGoals = await page.$$eval(__goalsList, $uls => {
-      return $uls.map((ul) => {
-        const goals: Goals[] = []
-        ul.querySelectorAll('li').forEach((li: HTMLElement) => {
-          const scorer = li.querySelector('a span:first-child')?.textContent?.trim() || ''
-          const minute = li.querySelector('a span:nth-child(2)')?.textContent?.trim() || ''
-          goals.push({ scorer, minute: minute.replaceAll('\'', '').split(', ') })
+    // extract goalscorers
+    const matchGoalsInfo = await page.$$eval(
+      __goalsEventContainer,
+      ($containers) => {
+        const goals: [
+          { href: string | null; time: string[] }[],
+          { href: string | null; time: string[] }[]
+        ] = [[], []]
+
+        $containers.forEach(($div) => {
+          $div = $div as HTMLElement
+          const svg = $div.querySelector('svg')?.children[0].children[0]
+          const $uls = $div.querySelectorAll('ul')
+
+          if (svg?.getAttribute('data-name') === 'Ellipse 497') {
+            $uls.forEach(($ul, index) => {
+              for (let i = 0; i < $ul.children.length; i++) {
+                const href =
+                  $ul.children[i].querySelector('a')?.getAttribute('href') ||
+                  null
+                const time =
+                  $ul.children[i]
+                    .querySelector('.elosikn11')
+                    ?.textContent?.split(',') || []
+                if (href && time) goals[index].push({ href, time })
+              }
+            })
+          }
         })
         return goals
-      })
-    })
+      }
+    )
 
-    const [date, stadium, referee, attendance] = (await page.locator(__matchDetails).allInnerTexts()).join('\n').split('\n')
+    const goals: MatchGoals = [[], []]
+    const goalScorerStats: PlayerStats[] = []
+    // extract goalScorers details
+    for (let i = 0; i < matchGoalsInfo.length; i++) {
+      if (matchGoalsInfo[i].length === 0) {
+        goals[i] = []
+        continue
+      }
+      for (let j = 0; j < matchGoalsInfo[i].length; j++) {
+        const goal = matchGoalsInfo[i][j]
+        await page.locator(`a[href='${goal.href}']`).first().click()
+        await page.waitForSelector(__playerStatsPopup, { state: 'visible' })
+
+        const [score, name, position] = await page.$eval(
+          __playerStatsPopup,
+          (data: HTMLElement) => data.innerText.trim().split('\n')
+        )
+        goals[i][j] = {
+          scorer: name,
+          minute: goal.time,
+        }
+
+        const playerStats: PlayerStats = await getPlayerStats({ page })
+
+        goalScorerStats.push({ name, position, score, ...playerStats })
+
+        await page.locator(__doneButton).click()
+      }
+    }
+
+    const [date, stadium, referee, attendance] = (
+      await page.locator(__matchDetails).allInnerTexts()
+    )
+      .join('\n')
+      .split('\n')
 
     data.matches.push({
       teams,
-      goals: matchGoals,
+      goals,
       playersStats: [],
       details: {
         date,
         stadium,
         attendance,
-        referee
-      }
+        referee,
+      },
     })
 
-    if (await page.locator(__matchStatus).innerText() === 'Abandoned') continue
+    if ((await page.locator(__matchStatus).innerText()) === 'Abandoned')
+      continue
+
     // extract players stats
-    const startersPlayersAnchor = await page.locator(__startersPlayersAnchor).all()
+    const startersPlayersAnchor = await page
+      .locator(__startersPlayersAnchor)
+      .all()
     const benchPlayersAnchor = await page.locator(__benchPlayersAnchor).all()
 
     const allPlayers = [...startersPlayersAnchor, ...benchPlayersAnchor]
@@ -75,53 +138,35 @@ export async function getRoundMatches(input: { page: PageInstance, totalMatches:
       const playerLink = await $a.getAttribute('href')
       if (!playerLink?.includes(':tab=facts')) continue
 
+      // Improve this part. We have to avoid clicking an goal scorer who has the stats already extracted
       await $a.click()
       await page.waitForSelector(__playerStatsPopup, { state: 'visible' })
 
-      const [score, name, position] = await page.$eval(__playerStatsPopup, (data: HTMLElement) => data.innerText.trim().split('\n'))
+      const [score, name, position] = await page.$eval(
+        __playerStatsPopup,
+        (data: HTMLElement) => data.innerText.trim().split('\n')
+      )
 
-      const playerStats: PlayerStats = await page.$$eval(__platerStats, (data, specialStats) => {
-        return data.reduce((acc: Record<string, string | number>, li) => {
-          li = li as HTMLElement
-          const [key, value] = li.innerText.trim().split('\n')
-          const camelCaseKey = key.toLowerCase().replaceAll(' ', '_')
-
-          type StatsMappingKey = keyof typeof specialStats;
-
-          if (specialStats[camelCaseKey as StatsMappingKey]) {
-            const [successful, total] = value.split('/').map((val) => Number(val.replace(/\(\d+%\)/g, '').trim()))
-            const missed = total - successful
-            const { baseKey, successKey, failKey } = specialStats[camelCaseKey as StatsMappingKey]
-
-            acc[`${baseKey}_total`] = total
-            acc[`${baseKey}_${successKey}`] = successful
-            acc[`${baseKey}_${failKey}`] = missed
-          } else {
-            const cleanedValue = isNaN(Number(value.trim())) ? value.trim() : Number(value.trim())
-            acc[camelCaseKey] = cleanedValue
-          }
-
-          return acc
-        }, {})
-      }, statMappings)
+      const playerStats =
+        goalScorerStats.find((ps) => ps.name === name) ??
+        (await getPlayerStats({ page }))
 
       playerStats.starter = iteration <= 22
-
       const lastMatch = data.matches.at(-1)
       if (lastMatch) {
         lastMatch.playersStats.push({
           name,
           position,
           score,
-          stats: playerStats
+          stats: playerStats,
         })
       }
       await page.locator(__doneButton).click()
     }
-    console.log(`${teams[0]} vs ${teams[1]} matchweek ${data.matchWeek} stats collected.`)
+    console.log(
+      `${teams[0]} vs ${teams[1]} matchweek ${data.matchWeek} stats collected.`
+    )
     console.log(`${++matchesFetched} / ${totalMatches} Matches collected.`)
   }
-
-
   return { results: data, updateMatchesFetched: matchesFetched }
 }
