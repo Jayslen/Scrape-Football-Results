@@ -8,14 +8,14 @@ import { valiateRoundSchema } from './schemas/match.js'
 import { validateTeamsSchema } from './schemas/teams.js'
 import { initializeBrowser } from './utils/initializeBrowser.js'
 import { getTeamsDataFiles } from './loaders/parseTeamsFiles.js'
-import { DB } from './db/dbInstance.js'
-import { InsertDataCommand } from './commands/teams-insertion/insertionCommands.js'
 import { League, LeagueSeason, Options } from '@customTypes/core'
 
 program
   .name('Scrape Football Results')
   .version('1.0.0')
-  .description('⚽ Welcome to Scrape Football Results! ⚽\n Get the latest scores and match data from your favorite leagues.')
+  .description(
+    '⚽ Welcome to Scrape Football Results! ⚽\n Get the latest scores and match data from your favorite leagues.'
+  )
 
 program
   .command('round <league> <season>')
@@ -33,7 +33,11 @@ program
       })
     )
 
-    const { success, data: roundData, error } = valiateRoundSchema({ league, season, options: modifiedOptions })
+    const {
+      success,
+      data: roundData,
+      error,
+    } = valiateRoundSchema({ league, season, options: modifiedOptions })
 
     if (!success) {
       console.error(prettifyError(error))
@@ -42,11 +46,12 @@ program
     await ScrapeDataCommands.rounds({
       RoundSchema: roundData,
       initializeBrowser,
-      leaguesAvailable: LEAGUES_AVAILABLE
+      leaguesAvailable: LEAGUES_AVAILABLE,
     })
   })
 
-program.command('teams <league>')
+program
+  .command('teams <league>')
   .description('Fetch teams for a specific league')
   .action(async (league: League) => {
     const { success, data: leagueSelected, error } = validateTeamsSchema(league)
@@ -57,37 +62,8 @@ program.command('teams <league>')
     await ScrapeDataCommands.teams({
       league: leagueSelected,
       initializeBrowser,
-      leaguesAvailable: LEAGUES_AVAILABLE
+      leaguesAvailable: LEAGUES_AVAILABLE,
     })
   })
-
-program.command('update-db-teams')
-  .description('Insert data from teams files into the database')
-  .action(async () => {
-    const { filesCountries,
-      filesPositions,
-      filesStadiums,
-      stadiumsData,
-      filesTeams,
-      filesTeamsData,
-      filesPlayers,
-      playersData,
-      filesPlayersPosition,
-      playersPositionFullData
-    } = await getTeamsDataFiles()
-    const dbConnection = await DB.initialize()
-    const insertDataCommand = new InsertDataCommand(dbConnection)
-
-    await insertDataCommand.executeAllInsertions({
-      countries: filesCountries,
-      positions: filesPositions,
-      stadiums: { filesStadiums, stadiumsFullData: stadiumsData },
-      teams: { teamsFullData: filesTeamsData, filesTeams },
-      players: { playersFullData: playersData, filesPlayers },
-      playersPositions: { filesPlayersPosition, playersPositionFullData },
-      includeLeagues: true
-    })
-  })
-
 
 program.parse()
