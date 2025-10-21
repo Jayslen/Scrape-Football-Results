@@ -217,8 +217,8 @@ export const Insetions: Record<string, InsertionConfig> = {
                 INNER JOIN players AS p ON p.player_id = pp.player_id
                 INNER JOIN positions AS ps ON ps.position_id = pp.position_id;`)
 
-      //@ts-ignore
       const existingData = new Set(
+        //@ts-ignore
         rows.map((row: any) => `${row.name}_$$_${row.position}`)
       )
       const unsavedPlayersPositions = new Set(

@@ -1,52 +1,61 @@
-import { Connection, DbRetriveDataParams } from "@customTypes/db";
-import { DbInsertionParams } from "@customTypes/db";
+import { Connection, DbRetriveDataParams } from '@customTypes/db'
+import { DbInsertionParams } from '@customTypes/db'
+import { randomUUID } from 'node:crypto'
 
 export async function insertRows(input: DbInsertionParams) {
-    const { queriesColumns, queryValues, dataInserted, dbConnection } = input;
+  const { queriesColumns, queryValues, dataInserted, dbConnection } = input
 
-    if (queryValues.length === 0) {
-        console.log(`No new ${dataInserted} to insert`);
-        return
-    }
+  if (queryValues.length === 0) {
+    console.log(`No new ${dataInserted} to insert`)
+    return
+  }
 
-    await dbConnection?.query(queriesColumns + queryValues.join(',\n'));
-    console.log(`Inserted ${queryValues.length} ${dataInserted}`);
-
+  await dbConnection?.query(queriesColumns + queryValues.join(',\n'))
+  console.log(`Inserted ${queryValues.length} ${dataInserted}`)
 }
 
 export async function getExistingValues(input: DbRetriveDataParams) {
-    const { table, column, localData, dbConnection } = input;
+  const { table, column, localData, dbConnection } = input
 
-    // @ts-ignore
-    const [rows] = await dbConnection?.query(`SELECT ${column} FROM ${table};`)
-    const existingData = new Set(rows.map((row: any) => Object.values(row).at(0)));
-    const dataToinsert = localData.difference(existingData);
+  // @ts-ignore
+  const [rows] = await dbConnection?.query(`SELECT ${column} FROM ${table};`)
+  const existingData = new Set(rows.map((row: any) => Object.values(row).at(0)))
+  const dataToinsert = localData.difference(existingData)
 
-    return { dataToinsert }
+  //   console.log({ existingData, localData, dataToinsert })
+  return { dataToinsert }
 }
 
 export async function insertAll(input: {
-    queries: DbInsertionParams,
-    retriveData: DbRetriveDataParams,
-    dbConnection: Connection
+  queries: DbInsertionParams
+  retriveData: DbRetriveDataParams
+  dbConnection: Connection
 }) {
+  const {
+    queries: { dataInserted, queriesColumns, queryValues },
+    retriveData: { column, localData, table },
+    dbConnection,
+  } = input
 
-    const {
-        queries: { dataInserted, queriesColumns, queryValues },
-        retriveData: { column, localData, table }, dbConnection
-    } = input;
+  const { dataToinsert } = await getExistingValues({
+    table,
+    column,
+    localData,
+    dbConnection,
+  })
 
-    const { dataToinsert } = await getExistingValues({ table, column, localData, dbConnection });
+  if (dataToinsert.size === 0) {
+    console.log(`No new ${dataInserted} to insert`)
+    return
+  }
+  const values = Array.from(dataToinsert).map(
+    (value) => `('${value}', UUID_TO_BIN('${randomUUID()}'))`
+  )
 
-    if (dataToinsert.size === 0) {
-        console.log(`No new ${dataInserted} to insert`);
-        return;
-    }
-
-    await insertRows({
-        queriesColumns,
-        queryValues,
-        dataInserted,
-        dbConnection
-    });
+  await insertRows({
+    queriesColumns,
+    queryValues: values,
+    dataInserted,
+    dbConnection,
+  })
 }

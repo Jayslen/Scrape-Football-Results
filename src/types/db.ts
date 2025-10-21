@@ -3,15 +3,15 @@ import { Connection as DBConnection } from 'mysql2/promise'
 export type Connection = DBConnection
 
 export type DbInsertionParams = {
-    queriesColumns: string
-    queryValues: string[]
-    dataInserted: string
-    dbConnection?: Connection
+  queriesColumns: string
+  queryValues: string[]
+  dataInserted: string
+  dbConnection?: Connection
 }
 
 export type DbRetriveDataParams = {
-    table: string
-    column: string
-    localData: Set<string>
-    dbConnection?: Connection
+  table: string
+  column: string
+  localData: Set<string>
+  dbConnection?: Connection
 }
