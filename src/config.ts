@@ -1,9 +1,4 @@
 import { LeaguesAvailable } from '@customTypes/core'
-import { InsertDataCommand } from './commands/teams-insertion/insertionCommands.js'
-import { getExistingValues, insertRows } from './db/dbStatements.js'
-import { randomUUID } from 'crypto'
-import { Stadium } from '@customTypes/teams'
-import { InsertionConfig } from '@customTypes/fs/teams'
 
 process.loadEnvFile()
 

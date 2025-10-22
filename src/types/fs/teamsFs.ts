@@ -1,42 +1,21 @@
-import { InsertDataCommand } from 'src/commands/teams-insertion/insertionCommands.js'
-import { Stadium } from '../teams.js'
-
-export interface InsertionConfig {
-  table: string
-  column: string
-  dataInserted: string
-  queriesColumns: string
-  generateQueryValues: (data: any) => string[]
-  getLocalData: (data: any) => Set<string>
-  useInsertAll?: boolean
-  useInsertRows?: boolean
-  customLogic?: (self: InsertDataCommand, data: any) => Promise<void>
+export enum BasicInsertions {
+  LEAGUES = 'leagues',
+  COUNTRIES = 'countries',
+  POSITIONS = 'positions',
+  STADIUMS = 'stadiums',
+  PLAYERS = 'players',
+  TEAMS = 'teams',
+  PLAYERS_POSITIONS = 'playersPositions',
 }
 
 export interface FilesData {
-  filesCountries: Set<string>
-  filesPositions: Set<string>
-  filesStadiums: Set<string>
-  stadiumsData: Stadium[]
-  filesTeams: Set<string>
-  filesTeamsData: { name: string; league: string; stadium: string }[]
-  filesPlayers: Set<string>
-  playersData: { name: string; country: string; team: string }[]
-  filesPlayersPosition: Set<string>
-  playersPositionFullData: { player: string; position: string; team: string }[]
-}
-
-export interface CacheTeamsFiles {
-  filesCountries: string[]
-  filesPositions: Position[]
-  filesStadiums: string[]
-  stadiumsData: StadiumsDatum[]
-  filesTeams: string[]
-  filesTeamsData: FilesTeamsDatum[]
-  filesPlayers: string[]
-  playersData: PlayersDatum[]
-  filesPlayersPosition: string[]
-  playersPositionFullData: PlayersPositionFullDatum[]
+  countriesValues: string[][]
+  positionsValues: string[][]
+  stadiumsValues: string[][]
+  teamsValues: string[][]
+  playersValues: string[][]
+  playersPositionsValues: string[][]
+  leaguesValues: string[][]
 }
 
 export enum Position {
@@ -60,7 +39,7 @@ export enum Position {
   St = 'ST',
 }
 
-export interface FilesTeamsDatum {
+export interface FilesTeamsData {
   name: string
   league: League
   stadium: string

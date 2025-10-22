@@ -10,7 +10,8 @@ import { initializeBrowser } from './utils/initializeBrowser.js'
 import { League, LeagueSeason, Options } from '@customTypes/core'
 import { getTeamsDataFiles } from './loaders/parseTeamsFiles.js'
 import DB from './db/dbInstance.js'
-import { InsertDataCommand } from './commands/teams-insertion/insertionCommands.js'
+import { InsertionCommand } from './commands/teams-insertion/InsertionCommand.js'
+import { BasicInsertions } from '@customTypes/fs/teams'
 
 program
   .name('Scrape Football Results')
@@ -72,30 +73,20 @@ program
   .command('update-db-teams')
   .description('Insert data from teams files into the database')
   .action(async () => {
-    const {
-      filesCountries,
-      filesPositions,
-      filesStadiums,
-      stadiumsData,
-      filesTeams,
-      filesTeamsData,
-      filesPlayers,
-      playersData,
-      filesPlayersPosition,
-      playersPositionFullData,
-    } = await getTeamsDataFiles()
-    const dbConnection = await DB.initialize()
-    const insertDataCommand = new InsertDataCommand(dbConnection)
+    const valuesToInsert = await getTeamsDataFiles()
 
-    await insertDataCommand.executeAllInsertions({
-      countries: filesCountries,
-      positions: filesPositions,
-      stadiums: { filesStadiums, stadiumsFullData: stadiumsData },
-      teams: { teamsFullData: filesTeamsData, filesTeams },
-      players: { playersFullData: playersData, filesPlayers },
-      playersPositions: { filesPlayersPosition, playersPositionFullData },
-      includeLeagues: true,
-    })
+    const dbConnection = await DB.initialize()
+    const command = new InsertionCommand(dbConnection, valuesToInsert)
+
+    await command.InsertBasics([
+      BasicInsertions.COUNTRIES,
+      BasicInsertions.LEAGUES,
+      BasicInsertions.POSITIONS,
+      BasicInsertions.STADIUMS,
+      BasicInsertions.TEAMS,
+      BasicInsertions.PLAYERS,
+      BasicInsertions.PLAYERS_POSITIONS,
+    ])
   })
 
 program.parse()
