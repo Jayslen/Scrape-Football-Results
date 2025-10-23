@@ -55,6 +55,7 @@ export const MATCH_ELEMENT_SELECTORS = {
   __teams: '.e10mt4ks1',
   __goalsEventContainer: '.css-1stqhah-EventContainer',
   __matchDetails: '.eq21sr51',
+  __attendance: '.e1c770xw9',
   __matchStatus: '.e1edwvyy9',
   __startersPlayersAnchor: '.e1ugt93g0 div > a',
   __benchPlayersAnchor: '.e1ymsyw60:nth-child(8) ul li a',

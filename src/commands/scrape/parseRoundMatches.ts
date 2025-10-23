@@ -1,5 +1,11 @@
 import { MATCH_ELEMENT_SELECTORS } from '../../config.js'
-import { MatchDetails, MatchGoals, PlayerStats } from '@customTypes/matches'
+import {
+  MatchDetails,
+  MatchGoals,
+  PlayersStats,
+  Position,
+  Stats,
+} from '@customTypes/matches'
 import { PageInstance } from '@customTypes/core'
 import { getPlayerStats } from '../../utils/extractPlayerMatchStats.js'
 
@@ -10,6 +16,7 @@ const {
   __teams,
   __goalsEventContainer,
   __matchDetails,
+  __attendance,
   __matchStatus,
   __startersPlayersAnchor,
   __benchPlayersAnchor,
@@ -33,10 +40,11 @@ export async function getRoundMatches(input: {
   data.league = await page.locator(__league).innerText()
   data.matchWeek = (await page.locator(__matchWeek).innerText())
     .split(' ')
-    .at(-1)
+    .at(-1) as string
 
   for (const matchLink of matchLinks) {
     await page.goto(`https://www.fotmob.com${matchLink}`, { waitUntil: 'load' })
+
     // extract teams
     const teams = await page.locator(__teams).allInnerTexts()
 
@@ -74,7 +82,8 @@ export async function getRoundMatches(input: {
     )
 
     const goals: MatchGoals = [[], []]
-    const goalScorerStats: PlayerStats[] = []
+    const goalScorerStats: PlayersStats[] = []
+
     // extract goalScorers details
     for (let i = 0; i < matchGoalsInfo.length; i++) {
       if (matchGoalsInfo[i].length === 0) {
@@ -95,19 +104,28 @@ export async function getRoundMatches(input: {
           minute: goal.time,
         }
 
-        const playerStats: PlayerStats = await getPlayerStats({ page })
+        const playerStats: Stats = await getPlayerStats({ page })
 
-        goalScorerStats.push({ name, position, score, ...playerStats })
+        goalScorerStats.push({
+          name,
+          position: position as Position,
+          score,
+          stats: playerStats,
+        })
 
         await page.locator(__doneButton).click()
       }
     }
 
-    const [date, stadium, referee, attendance] = (
+    const [date, stadium, referee] = (
       await page.locator(__matchDetails).allInnerTexts()
     )
       .join('\n')
       .split('\n')
+
+    const attendance = (await page.locator(__attendance).nth(1).innerText())
+      .split('\n')
+      .at(-1)
 
     data.matches.push({
       teams,
@@ -124,7 +142,6 @@ export async function getRoundMatches(input: {
     if ((await page.locator(__matchStatus).innerText()) === 'Abandoned')
       continue
 
-    // extract players stats
     const startersPlayersAnchor = await page
       .locator(__startersPlayersAnchor)
       .all()
@@ -147,16 +164,27 @@ export async function getRoundMatches(input: {
         (data: HTMLElement) => data.innerText.trim().split('\n')
       )
 
-      const playerStats =
-        goalScorerStats.find((ps) => ps.name === name) ??
-        (await getPlayerStats({ page }))
-
-      playerStats.starter = iteration <= 22
+      const existingPlayerStats = goalScorerStats.find((ps) => ps.name === name)
       const lastMatch = data.matches.at(-1)
+      const isStarter = iteration <= 22
+
+      // reuse goal scorer stats if available
+      if (existingPlayerStats) {
+        existingPlayerStats.stats.starter = isStarter
+        if (lastMatch) {
+          await page.locator(__doneButton).click()
+          lastMatch.playersStats.push(existingPlayerStats)
+          continue
+        }
+      }
+
+      // extract if player stats is not found in goalScorerStats
+      const playerStats = await getPlayerStats({ page })
+      playerStats.starter = isStarter
       if (lastMatch) {
         lastMatch.playersStats.push({
           name,
-          position,
+          position: position as Position,
           score,
           stats: playerStats,
         })

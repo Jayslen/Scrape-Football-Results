@@ -1,6 +1,7 @@
-import { PlayerStats } from '@customTypes/matches'
+import { PlayersStats, Stats } from '@customTypes/matches'
 import { PageInstance } from '@customTypes/browser'
 import { MATCH_ELEMENT_SELECTORS, statMappings } from '.././config.js'
+import { mapToStats } from './mapStats.js'
 
 const { __platerStats } = MATCH_ELEMENT_SELECTORS
 
@@ -8,8 +9,8 @@ export async function getPlayerStats({
   page,
 }: {
   page: PageInstance
-}): Promise<PlayerStats> {
-  const playerStats: PlayerStats = await page.$$eval(
+}): Promise<Stats> {
+  const playerStats = await page.$$eval(
     __platerStats,
     (data, specialStats) => {
       return data.reduce((acc: Record<string, string | number>, li) => {
@@ -42,5 +43,5 @@ export async function getPlayerStats({
     },
     statMappings
   )
-  return playerStats
+  return mapToStats(playerStats)
 }

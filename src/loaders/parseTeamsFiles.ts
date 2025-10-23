@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises'
 import path, { parse } from 'node:path'
-import { FilesData } from '@customTypes/fs/teams'
+import { FilesData } from '@customTypes/fs'
 import { Teams } from '@customTypes/teams'
 import { randomUUID } from 'node:crypto'
 import { LEAGUES_AVAILABLE } from '../config.js'

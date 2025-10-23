@@ -1,6 +1,7 @@
 import { Connection, ResultSetHeader } from 'mysql2/promise'
 import { InsertionConfig } from './InsertionConfig.js'
-import { BasicInsertions, FilesData } from '@customTypes/fs/teams'
+import { FilesData } from '@customTypes/fs'
+import { BasicInsertions } from '@customTypes/core'
 
 export class InsertionCommand {
   private dbConnection: Connection
