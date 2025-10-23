@@ -19,7 +19,9 @@ export class InsertionCommand {
                   `(${valueSet
                     .map((value) =>
                       value.startsWith('UUID_TO_BIN(') ||
-                      value.startsWith('(SELECT')
+                      value.startsWith('(SELECT') ||
+                      value.startsWith('CAST(') ||
+                      value === 'NULL'
                         ? value
                         : `'${value.replace(/'/g, "\\'")}'`
                     )

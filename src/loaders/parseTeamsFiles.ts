@@ -96,12 +96,29 @@ export async function getTeamsDataFiles(): Promise<FilesData> {
           name: player.name,
           country: player.country,
           team: team.teamName,
+          shirtNumber: parseInt(player.shirt),
+          height: player.height,
+          marketValue:
+            player.marketValue.slice(-1) === 'M'
+              ? parseFloat(player.marketValue.slice(0, -1)) * 1_000_000
+              : parseFloat(player.marketValue.slice(0, -1)) * 1_000,
         }))
       )
       .forEach((player) => {
         playersValues.push([
           `UUID_TO_BIN('${randomUUID()}')`,
           player.name,
+          `${
+            isNaN(player.shirtNumber)
+              ? 'NULL'
+              : `CAST(${player.shirtNumber} AS SIGNED)`
+          }`,
+          `CAST('${player.height}' AS SIGNED)`,
+          `${
+            isNaN(player.marketValue)
+              ? 'NULL'
+              : `CAST(${player.marketValue} AS SIGNED)`
+          }`,
           `(SELECT country_id FROM countries WHERE LOWER(country) = LOWER('${player.country}'))`,
           `(SELECT team_id FROM teams WHERE LOWER(name) = LOWER('${player.team}'))`,
         ])
@@ -113,7 +130,7 @@ export async function getTeamsDataFiles(): Promise<FilesData> {
         player.positions.forEach((position) => {
           playersPositionsValues.push([
             `(SELECT player_id FROM players 
-    WHERE LOWER(name) = LOWER('${player.name.replace(/'/g, "\\'")}')
+    WHERE LOWER(player_name) = LOWER('${player.name.replace(/'/g, "\\'")}')
     AND team_id = (SELECT team_id FROM teams WHERE LOWER(name) = LOWER('${team.teamName.replace(
       /'/g,
       "\\'"

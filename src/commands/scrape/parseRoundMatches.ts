@@ -30,6 +30,8 @@ export async function getRoundMatches(input: {
     return links.map((link) => link.getAttribute('href'))
   })
 
+  await page.waitForSelector(__matchWeek)
+
   data.league = await page.locator(__league).innerText()
   data.matchWeek = (await page.locator(__matchWeek).innerText())
     .split(' ')

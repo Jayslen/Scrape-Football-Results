@@ -32,7 +32,15 @@ export const InsertionConfig: Record<string, InsertConfig> = {
   },
   players: {
     table: 'players',
-    columns: ['player_id', 'name', 'country_id', 'team_id'],
+    columns: [
+      'player_id',
+      'player_name',
+      'shirt_number',
+      'height',
+      'market_value',
+      'country_id',
+      'team_id',
+    ],
     dataInserted: 'players',
   },
   playersPositions: {
