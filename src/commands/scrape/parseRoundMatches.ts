@@ -1,7 +1,7 @@
 import { MATCH_ELEMENT_SELECTORS } from '../../config.js'
 import { MatchDetails, MatchGoals, PlayerStats } from '@customTypes/matches'
 import { PageInstance } from '@customTypes/core'
-import { getPlayerStats } from 'src/utils/extractPlayerMatchStats.js'
+import { getPlayerStats } from '../../utils/extractPlayerMatchStats.js'
 
 const {
   __matchAnchors,
@@ -29,8 +29,6 @@ export async function getRoundMatches(input: {
   const matchLinks = await page.$$eval(__matchAnchors, (links) => {
     return links.map((link) => link.getAttribute('href'))
   })
-
-  await page.waitForSelector(__matchWeek)
 
   data.league = await page.locator(__league).innerText()
   data.matchWeek = (await page.locator(__matchWeek).innerText())

@@ -11,7 +11,8 @@ import { League, LeagueSeason, Options } from '@customTypes/core'
 import { getTeamsDataFiles } from './loaders/parseTeamsFiles.js'
 import DB from './db/dbInstance.js'
 import { InsertionCommand } from './commands/teams-insertion/InsertionCommand.js'
-import { BasicInsertions } from '@customTypes/fs/teams'
+import { BasicInsertions } from './types/fs/teamsFs.js'
+// import { BasicInsertions } from '
 
 program
   .name('Scrape Football Results')

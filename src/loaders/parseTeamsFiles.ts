@@ -3,7 +3,7 @@ import path, { parse } from 'node:path'
 import { FilesData } from '@customTypes/fs/teams'
 import { Teams } from '@customTypes/teams'
 import { randomUUID } from 'node:crypto'
-import { LEAGUES_AVAILABLE } from 'src/config.js'
+import { LEAGUES_AVAILABLE } from '../config.js'
 
 const { root } = parse(process.cwd())
 
