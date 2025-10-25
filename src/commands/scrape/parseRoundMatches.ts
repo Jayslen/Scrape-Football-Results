@@ -123,7 +123,7 @@ export async function getRoundMatches(input: {
       .join('\n')
       .split('\n')
 
-    const attendance = (await page.locator(__attendance).nth(1).innerText())
+    const attendance = (await page.locator(__attendance).last().innerText())
       .split('\n')
       .at(-1)
 
