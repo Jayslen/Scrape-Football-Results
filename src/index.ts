@@ -9,7 +9,6 @@ import { validateTeamsSchema } from './schemas/teams.js'
 import { initializeBrowser } from './utils/initializeBrowser.js'
 import { League, LeagueSeason, Options } from '@customTypes/core'
 import { getTeamsDataFiles } from './loaders/parseTeamsFiles.js'
-import DB from './db/dbInstance.js'
 import { InsertionCommand } from './commands/teams-insertion/InsertionCommand.js'
 import { BasicInsertions } from './types/core.js'
 
@@ -74,19 +73,20 @@ program
   .description('Insert data from teams files into the database')
   .action(async () => {
     const valuesToInsert = await getTeamsDataFiles()
+    const command = await InsertionCommand.getInstance()
 
-    const dbConnection = await DB.initialize()
-    const command = new InsertionCommand(dbConnection, valuesToInsert)
-
-    await command.InsertBasics([
-      BasicInsertions.COUNTRIES,
-      BasicInsertions.LEAGUES,
-      BasicInsertions.POSITIONS,
-      BasicInsertions.STADIUMS,
-      BasicInsertions.TEAMS,
-      BasicInsertions.PLAYERS,
-      BasicInsertions.PLAYERS_POSITIONS,
-    ])
+    await command.insertTeamsData(
+      [
+        BasicInsertions.COUNTRIES,
+        BasicInsertions.LEAGUES,
+        BasicInsertions.POSITIONS,
+        BasicInsertions.STADIUMS,
+        BasicInsertions.TEAMS,
+        BasicInsertions.PLAYERS,
+        BasicInsertions.PLAYERS_POSITIONS,
+      ],
+      valuesToInsert
+    )
   })
 
 program.parse()
