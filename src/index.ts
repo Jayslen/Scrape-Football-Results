@@ -8,9 +8,9 @@ import { valiateRoundSchema } from './schemas/match.js'
 import { validateTeamsSchema } from './schemas/teams.js'
 import { initializeBrowser } from './utils/initializeBrowser.js'
 import { League, LeagueSeason, Options } from '@customTypes/core'
-import { getTeamsDataFiles } from './loaders/parseTeamsFiles.js'
+import { getTeamsValues } from './loaders/parseTeamsValues.js'
 import { InsertionCommand } from './commands/teams-insertion/InsertionCommand.js'
-import { BasicInsertions } from './types/core.js'
+import { Insertions } from './types/core.js'
 
 program
   .name('Scrape Football Results')
@@ -72,18 +72,18 @@ program
   .command('update-db-teams')
   .description('Insert data from teams files into the database')
   .action(async () => {
-    const valuesToInsert = await getTeamsDataFiles()
+    const valuesToInsert = await getTeamsValues()
     const command = await InsertionCommand.getInstance()
 
     await command.insertTeamsData(
       [
-        BasicInsertions.COUNTRIES,
-        BasicInsertions.LEAGUES,
-        BasicInsertions.POSITIONS,
-        BasicInsertions.STADIUMS,
-        BasicInsertions.TEAMS,
-        BasicInsertions.PLAYERS,
-        BasicInsertions.PLAYERS_POSITIONS,
+        Insertions.COUNTRIES,
+        Insertions.LEAGUES,
+        Insertions.POSITIONS,
+        Insertions.STADIUMS,
+        Insertions.TEAMS,
+        Insertions.PLAYERS,
+        Insertions.PLAYERS_POSITIONS,
       ],
       valuesToInsert
     )

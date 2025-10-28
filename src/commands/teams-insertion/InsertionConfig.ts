@@ -48,4 +48,20 @@ export const InsertionConfig: Record<string, InsertConfig> = {
     columns: ['player_id', 'position_id'],
     dataInserted: 'player_positions',
   },
+  matches: {
+    table: 'matches',
+    columns: [
+      'match_id',
+      'home_team_id',
+      'visit_team_id',
+      'attendance',
+      'season',
+      'competition',
+      'match_week',
+      'match_date',
+      'stadium_id',
+      'referee',
+    ],
+    dataInserted: 'matches',
+  },
 }

@@ -1,7 +1,7 @@
 import { Connection, ResultSetHeader } from 'mysql2/promise'
 import { InsertionConfig } from './InsertionConfig.js'
 import { FilesData } from '@customTypes/fs'
-import { BasicInsertions } from '@customTypes/core'
+import { Insertions } from '@customTypes/core'
 import DB from 'src/db/dbInstance.js'
 
 export class InsertionCommand {
@@ -19,7 +19,11 @@ export class InsertionCommand {
     return InsertionCommand.instance
   }
 
-  private GenerateQuery(table: string, columns: string[], values: string[][]) {
+  private GenerateQuery(
+    table: string,
+    columns: string[],
+    values: (string | number)[][]
+  ) {
     return `
             INSERT IGNORE INTO ${table} (${columns.join(', ')})
             VALUES ${values
@@ -27,9 +31,9 @@ export class InsertionCommand {
                 (valueSet) =>
                   `(${valueSet
                     .map((value) =>
+                      typeof value === 'number' ||
                       value.startsWith('UUID_TO_BIN(') ||
                       value.startsWith('(SELECT') ||
-                      value.startsWith('CAST(') ||
                       value.startsWith('STR_TO_DATE(') ||
                       value === 'NULL'
                         ? value
@@ -41,7 +45,7 @@ export class InsertionCommand {
         `
   }
 
-  private async BasicInsertion(input: BasicInsertions, values: string[][]) {
+  private async Insertion(input: Insertions, values: string[][]) {
     const currentInsertion = InsertionConfig[input]
     const QUERY = this.GenerateQuery(
       currentInsertion.table,
@@ -54,10 +58,10 @@ export class InsertionCommand {
     )
   }
 
-  public async insertTeamsData(input: BasicInsertions[], filesData: FilesData) {
+  public async insertTeamsData(input: Insertions[], filesData: FilesData) {
     for (const insertion of input) {
       const valuesKey = `${insertion}Values` as keyof FilesData
-      await this.BasicInsertion(insertion, filesData[valuesKey])
+      await this.Insertion(insertion, filesData[valuesKey])
     }
     this.dbConnection.end()
   }

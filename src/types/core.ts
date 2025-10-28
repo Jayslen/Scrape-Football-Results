@@ -16,7 +16,7 @@ export type LeaguesAvailable = {
 export type PageInstance = Page
 export type BrowserInstance = Browser | undefined
 
-export enum BasicInsertions {
+export enum Insertions {
   LEAGUES = 'leagues',
   COUNTRIES = 'countries',
   POSITIONS = 'positions',
@@ -24,4 +24,5 @@ export enum BasicInsertions {
   PLAYERS = 'players',
   TEAMS = 'teams',
   PLAYERS_POSITIONS = 'playersPositions',
+  MATCHES = 'matches',
 }
