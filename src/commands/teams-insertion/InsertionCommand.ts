@@ -8,15 +8,8 @@ export class InsertionCommand {
   private dbConnection!: Connection
   private static instance: InsertionCommand | null = null
 
-  private constructor() {}
-
-  public static async getInstance(): Promise<InsertionCommand> {
-    if (!InsertionCommand.instance) {
-      const newInstance = new InsertionCommand()
-      newInstance.dbConnection = await DB.getInstance()
-      InsertionCommand.instance = newInstance
-    }
-    return InsertionCommand.instance
+  constructor(dbConnection: Connection) {
+    this.dbConnection = dbConnection
   }
 
   private GenerateQuery(
@@ -46,7 +39,7 @@ export class InsertionCommand {
         `
   }
 
-  private async Insertion(input: Insertions, values: string[][]) {
+  public async Insertion(input: Insertions, values: string[][]) {
     const currentInsertion = InsertionConfig[input]
     const QUERY = this.GenerateQuery(
       currentInsertion.table,
@@ -57,14 +50,5 @@ export class InsertionCommand {
     console.log(
       `Inserted ${result.affectedRows} ${currentInsertion.dataInserted}`
     )
-  }
-
-  public async insertTeamsData(input: Insertions, values: string[][]) {
-    await this.Insertion(input, values)
-  }
-
-  public async InsertMatches(values: string[][]) {
-    await this.Insertion(Insertions.MATCHES, values)
-    this.dbConnection.end()
   }
 }

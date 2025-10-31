@@ -71,37 +71,40 @@ program
   })
 
 program
-  .command('update-db-teams')
-  .description('Insert data from teams files into the database')
-  .action(async () => {
-    const command = await InsertionCommand.getInstance()
-    const dataToInsert = [
-      Insertions.COUNTRIES,
-      Insertions.LEAGUES,
-      Insertions.POSITIONS,
-      Insertions.STADIUMS,
-      Insertions.TEAMS,
-      Insertions.PLAYERS,
-      Insertions.PLAYERS_POSITIONS,
-    ]
-    for (const insertion of dataToInsert) {
-      const getValuesFunction = ValuesParserMap.get(insertion)
-      if (getValuesFunction) {
-        const values = await getValuesFunction()
-        await command.insertTeamsData(insertion, values)
+  .command('insert')
+  .description('Insert specified data into the database')
+  .option('-l, --list <items>', 'Comma-separated list of data types to insert')
+  .action(
+    async (options: { list?: string; teams?: boolean; matches?: boolean }) => {
+      const dataToInsert = options?.list
+        ? options.list.split(' ')
+        : Object.values(Insertions)
+
+      const isValid = dataToInsert.every((item) =>
+        Object.values(Insertions).includes(item as Insertions)
+      )
+
+      if (!isValid) {
+        console.error('Invalid insertion type provided.')
+        process.exit(1)
       }
+
+      const db = await DB.getInstance()
+      const command = new InsertionCommand(db)
+      for (const insertion of dataToInsert) {
+        if (insertion === Insertions.MATCHES) {
+          const valuesToInsert = await parseMatchesFiles()
+          await command.Insertion(insertion, valuesToInsert)
+          continue
+        }
+        const getValuesFunction = ValuesParserMap.get(insertion as Insertions)
+        if (getValuesFunction) {
+          const values = await getValuesFunction()
+          await command.Insertion(insertion as Insertions, values)
+        }
+      }
+      db.end()
     }
-
-    ;(await DB.getInstance()).end()
-  })
-program
-  .command('update-db-matches')
-  .description('Insert data from matches files into the database')
-  .action(async () => {
-    const valuesToInsert = await parseMatchesFiles()
-    const command = await InsertionCommand.getInstance()
-
-    await command.InsertMatches(valuesToInsert)
-  })
+  )
 
 program.parse()
