@@ -10,7 +10,7 @@ import { initializeBrowser } from './utils/initializeBrowser.js'
 import { League, LeagueSeason, Options } from '@customTypes/core'
 import { InsertionCommand } from './commands/teams-insertion/InsertionCommand.js'
 import { Insertions } from './types/core.js'
-import { parseMatchesFiles } from './loaders/parseMatchesFiles.js'
+import { parseMatchesFiles } from './loaders/parseMatchesValues.js'
 import { ValuesParserMap } from './loaders/parseTeamsValues.js'
 import DB from './db/dbInstance.js'
 
@@ -93,6 +93,15 @@ program
     }
 
     ;(await DB.getInstance()).end()
+  })
+program
+  .command('update-db-matches')
+  .description('Insert data from matches files into the database')
+  .action(async () => {
+    const valuesToInsert = await parseMatchesFiles()
+    const command = await InsertionCommand.getInstance()
+
+    await command.InsertMatches(valuesToInsert)
   })
 
 program.parse()

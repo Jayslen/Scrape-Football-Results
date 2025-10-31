@@ -62,4 +62,9 @@ export class InsertionCommand {
   public async insertTeamsData(input: Insertions, values: string[][]) {
     await this.Insertion(input, values)
   }
+
+  public async InsertMatches(values: string[][]) {
+    await this.Insertion(Insertions.MATCHES, values)
+    this.dbConnection.end()
+  }
 }

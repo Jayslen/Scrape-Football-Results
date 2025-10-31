@@ -1,6 +1,11 @@
 import path, { parse } from 'path'
 import fs from 'fs/promises'
 import { Teams } from '@customTypes/teams'
+import { MatchDetails } from '@customTypes/matches'
+import DB from 'src/db/dbInstance.js'
+import { randomUUID } from 'crypto'
+import { scapeQuote } from 'src/utils/scapeSqlQuote.js'
+import PreloadDBData from './preload.js'
 
 export class FilesParser {
   static async TeamsFiles() {
@@ -69,5 +74,73 @@ export class FilesParser {
       players: player,
       playersPositions,
     }
+  }
+
+  static async MatchesFiles() {
+    const { root } = parse(process.cwd())
+
+    const matchesDir = path.join(root, 'football-stats', 'matches')
+    const matchesFiles = await fs.readdir(matchesDir)
+
+    const matchesData: MatchDetails[] = []
+
+    for (const file of matchesFiles) {
+      const leagueDir = path.join(matchesDir, file)
+      const leagueSeasons = await fs.readdir(leagueDir)
+
+      for (const season of leagueSeasons) {
+        const seasonDir = path.join(leagueDir, season)
+        const seasonFiles = await fs.readdir(seasonDir)
+        for (const matchFile of seasonFiles) {
+          const filePath = path.join(seasonDir, matchFile)
+          const fileContent = await fs.readFile(filePath, 'utf-8')
+          const matchData: MatchDetails = JSON.parse(fileContent)
+          matchesData.push(matchData)
+        }
+      }
+    }
+
+    const db = await DB.getInstance()
+    const teamsDb = await PreloadDBData.teams()
+    const stadiumsDb = await PreloadDBData.stadiums()
+
+    const stadiumsNotInDB = [
+      ...new Set(
+        matchesData
+          .flatMap((data) => data.matches.map((match) => match.details.stadium))
+          .filter((stadium) => !stadiumsDb.has(stadium))
+      ),
+    ]
+
+    const teamsNotInDB = [
+      ...new Set(
+        matchesData
+          .flatMap((data) => data.matches.flatMap((match) => match.teams))
+          .filter((team) => !teamsDb.has(team))
+      ),
+    ]
+
+    if (stadiumsNotInDB.length > 0) {
+      const values = stadiumsNotInDB
+        .map(
+          (stadium) =>
+            `(UUID_TO_BIN('${randomUUID()}', 1),'${scapeQuote(stadium)}')`
+        )
+        .join(', ')
+      await db.query(
+        `INSERT INTO stadiums (stadium_id, stadium) VALUES ${values}`
+      )
+    }
+
+    if (teamsNotInDB.length > 0) {
+      const values = teamsNotInDB
+        .map(
+          (team) => `(UUID_TO_BIN('${randomUUID()}', 1), '${scapeQuote(team)}')`
+        )
+        .join(', ')
+
+      await db.query(`INSERT INTO teams (team_id, name) VALUES ${values}`)
+    }
+    return matchesData
   }
 }

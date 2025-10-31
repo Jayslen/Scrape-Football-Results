@@ -22,15 +22,6 @@ const filesData: FilesData = {
 const { countries, teams, players, playersPositions, positions, stadiums } =
   await FilesParser.TeamsFiles()
 
-console.log({
-  countries: countries.length,
-  teams: teams.length,
-  players: players.length,
-  playersPositions: playersPositions.length,
-  positions: positions.length,
-  stadiums: stadiums.length,
-})
-
 const {
   countriesValues,
   positionsValues,
