@@ -122,14 +122,10 @@ ValuesParserMap.set(Insertions.PLAYERS_POSITIONS, async () => {
 
   playersPositionsValues.push(
     ...playersPositions.map(({ player, position }) => {
-      const playerTeam =
-        players.find((p) => p.name === player)?.team.replace(/'/g, "\\'") || ''
-      const playerId =
-        playersWithTeam.find(
-          (p) =>
-            p.player_name.replace(/'/g, "\\'") ===
-              player.replace(/'/g, "\\'") && p.team === playerTeam
-        )?.player_id || ''
+      const playerTeam = players.find((p) => p.name === player)?.team
+      const playerId = playersWithTeam.find(
+        (p) => p.player_name === player && p.team === playerTeam
+      )?.player_id
       return [
         `UUID_TO_BIN('${playerId}', 1)`,
         `UUID_TO_BIN('${positionsDbMap.get(position)}', 1)`,
