@@ -26,7 +26,8 @@ export class InsertionCommand {
   ) {
     return `
             INSERT IGNORE INTO ${table} (${columns.join(', ')})
-            VALUES ${values
+            VALUES \n
+            ${values
               .map(
                 (valueSet) =>
                   `(${valueSet
@@ -41,7 +42,7 @@ export class InsertionCommand {
                     )
                     .join(', ')})`
               )
-              .join(', ')}
+              .join(',\n')}
         `
   }
 
@@ -58,11 +59,7 @@ export class InsertionCommand {
     )
   }
 
-  public async insertTeamsData(input: Insertions[], filesData: FilesData) {
-    for (const insertion of input) {
-      const valuesKey = `${insertion}Values` as keyof FilesData
-      await this.Insertion(insertion, filesData[valuesKey])
-    }
-    this.dbConnection.end()
+  public async insertTeamsData(input: Insertions, values: string[][]) {
+    await this.Insertion(input, values)
   }
 }
