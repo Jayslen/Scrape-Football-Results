@@ -45,7 +45,7 @@ export async function getRoundMatches(input: {
     .split(' ')
     .at(-1) as string
 
-  for (const matchLink of matchLinks.slice(7)) {
+  for (const matchLink of matchLinks) {
     await page.goto(`https://www.fotmob.com${matchLink}`, { waitUntil: 'load' })
 
     // extract teams
