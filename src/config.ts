@@ -60,6 +60,9 @@ export const MATCH_ELEMENT_SELECTORS = {
   __startersPlayersAnchor: '.e1ugt93g0 div > a',
   __benchPlayersAnchor: '.e1ymsyw60:nth-child(8) ul li a',
   __playerStatsPopup: '.e123zo9c9',
+  __playerPopupRaiting: '.e123zo9c9 .e1t3jm3m0',
+  __playerPopupName: '.e123zo9c9 .e123zo9c1',
+  __playerPopupInfo: '.e123zo9c8',
   __platerStats: '.e123zo9c10 .e123zo9c2 li:not(:first-child)',
   __doneButton: '.e123zo9c11',
 }

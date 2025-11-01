@@ -21,6 +21,9 @@ const {
   __startersPlayersAnchor,
   __benchPlayersAnchor,
   __playerStatsPopup,
+  __playerPopupName,
+  __playerPopupRaiting,
+  __playerPopupInfo,
   __doneButton,
 } = MATCH_ELEMENT_SELECTORS
 
@@ -42,7 +45,7 @@ export async function getRoundMatches(input: {
     .split(' ')
     .at(-1) as string
 
-  for (const matchLink of matchLinks) {
+  for (const matchLink of matchLinks.slice(7)) {
     await page.goto(`https://www.fotmob.com${matchLink}`, { waitUntil: 'load' })
 
     // extract teams
@@ -95,10 +98,20 @@ export async function getRoundMatches(input: {
         await page.locator(`a[href='${goal.href}']`).first().click()
         await page.waitForSelector(__playerStatsPopup, { state: 'visible' })
 
-        const [score, name, position] = await page.$eval(
-          __playerStatsPopup,
-          (data: HTMLElement) => data.innerText.trim().split('\n')
-        )
+        // Create a util to extract player position from info section to avoid code repetition
+        // Some players don't have score, so we check if score element is visible
+        const playerHasScore = await page
+          .locator(__playerPopupRaiting)
+          .isVisible()
+
+        const [name, score, position] = await Promise.all([
+          page.locator(__playerPopupName).innerText(),
+          playerHasScore
+            ? page.locator(__playerPopupRaiting).innerText()
+            : 'N/A',
+          page.locator('.info-span').first().innerText(),
+        ])
+
         goals[i][j] = {
           scorer: name,
           minute: goal.time,
@@ -159,10 +172,18 @@ export async function getRoundMatches(input: {
       await $a.click()
       await page.waitForSelector(__playerStatsPopup, { state: 'visible' })
 
-      const [score, name, position] = await page.$eval(
-        __playerStatsPopup,
-        (data: HTMLElement) => data.innerText.trim().split('\n')
-      )
+      // Create a util to extract player position from info section to avoid code repetition
+      // Some players don't have score, so we check if score element is visible
+      const playerHasScore = await page
+        .locator(__playerPopupRaiting)
+        .isVisible()
+
+      const [name, score, position] = await Promise.all([
+        page.locator(__playerPopupName).innerText(),
+        playerHasScore ? page.locator(__playerPopupRaiting).innerText() : 'N/A',
+        page.locator('.info-span').first().innerText(),
+      ])
+      console.log({ name, score, position })
 
       const existingPlayerStats = goalScorerStats.find((ps) => ps.name === name)
       const lastMatch = data.matches.at(-1)
