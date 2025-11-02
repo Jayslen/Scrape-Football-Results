@@ -4,8 +4,8 @@ import { roundSchema } from '../schemas/match.js'
 export type RoundSchema = z.infer<typeof roundSchema>
 
 export type Goals = {
-  scorer?: string
-  minute?: string[]
+  scorer: string
+  minute: string[]
 }
 export type MatchGoals = Goals[][]
 
@@ -17,7 +17,7 @@ export type MatchDetails = {
 
 export interface Match {
   teams: string[]
-  goals: any[]
+  goals: MatchGoals
   playersStats: PlayersStats[]
   details: Details
 }

@@ -1,13 +1,9 @@
 import { Connection, ResultSetHeader } from 'mysql2/promise'
 import { InsertionConfig } from './InsertionConfig.js'
-import { FilesData } from '@customTypes/fs'
 import { Insertions } from '@customTypes/core'
-import DB from 'src/db/dbInstance.js'
 
 export class InsertionCommand {
   private dbConnection!: Connection
-  private static instance: InsertionCommand | null = null
-
   constructor(dbConnection: Connection) {
     this.dbConnection = dbConnection
   }
@@ -39,7 +35,7 @@ export class InsertionCommand {
         `
   }
 
-  public async Insertion(input: Insertions, values: string[][]) {
+  public async Insertion(input: Insertions, values: (string | number)[][]) {
     const currentInsertion = InsertionConfig[input]
     const QUERY = this.GenerateQuery(
       currentInsertion.table,

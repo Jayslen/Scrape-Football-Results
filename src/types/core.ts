@@ -21,8 +21,9 @@ export enum Insertions {
   COUNTRIES = 'countries',
   POSITIONS = 'positions',
   STADIUMS = 'stadiums',
-  PLAYERS = 'players',
   TEAMS = 'teams',
+  PLAYERS = 'players',
   PLAYERS_POSITIONS = 'playersPositions',
   MATCHES = 'matches',
+  GOALS = 'goals'
 }

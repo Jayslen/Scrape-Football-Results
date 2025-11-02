@@ -100,9 +100,11 @@ export class FilesParser {
       }
     }
 
+    // adding values missing in the DB
     const db = await DB.getInstance()
     const teamsDb = await PreloadDBData.teams()
     const stadiumsDb = await PreloadDBData.stadiums()
+    const playersDb = await PreloadDBData.players()
 
     const stadiumsNotInDB = [
       ...new Set(
@@ -119,6 +121,18 @@ export class FilesParser {
           .filter((team) => !teamsDb.has(team))
       ),
     ]
+
+    const goalScorersNotInDB = new Set(
+      matchesData
+        .flatMap((data) =>
+          data.matches.flatMap((match) =>
+            match.goals.flatMap((teamGoals) =>
+              teamGoals.map((goal) => goal.scorer)
+            )
+          )
+        )
+        .filter((scorer) => !playersDb.has(scorer))
+    )
 
     if (stadiumsNotInDB.length > 0) {
       const values = stadiumsNotInDB
@@ -140,6 +154,18 @@ export class FilesParser {
         .join(', ')
 
       await db.query(`INSERT INTO teams (team_id, name) VALUES ${values}`)
+    }
+
+    if (goalScorersNotInDB.size > 0) {
+      const values = Array.from(goalScorersNotInDB)
+        .map(
+          (scorer) =>
+            `(UUID_TO_BIN('${randomUUID()}', 1), '${scapeQuote(scorer)}')`
+        )
+        .join(', ')
+      await db.query(
+        `INSERT INTO players (player_id, player_name) VALUES ${values}`
+      )
     }
     return matchesData
   }

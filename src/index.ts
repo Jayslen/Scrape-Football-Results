@@ -12,6 +12,7 @@ import { InsertionCommand } from './commands/teams-insertion/InsertionCommand.js
 import { Insertions } from './types/core.js'
 import { parseMatchesFiles } from './loaders/parseMatchesValues.js'
 import { ValuesParserMap } from './loaders/parseTeamsValues.js'
+import { parseGoalsValues } from './loaders/parseGoalsValues.js'
 import DB from './db/dbInstance.js'
 
 program
@@ -40,7 +41,7 @@ program
     const {
       success,
       data: roundData,
-      error,
+      error
     } = valiateRoundSchema({ league, season, options: modifiedOptions })
 
     if (!success) {
@@ -50,7 +51,7 @@ program
     await ScrapeDataCommands.rounds({
       RoundSchema: roundData,
       initializeBrowser,
-      leaguesAvailable: LEAGUES_AVAILABLE,
+      leaguesAvailable: LEAGUES_AVAILABLE
     })
   })
 
@@ -66,7 +67,7 @@ program
     await ScrapeDataCommands.teams({
       league: leagueSelected,
       initializeBrowser,
-      leaguesAvailable: LEAGUES_AVAILABLE,
+      leaguesAvailable: LEAGUES_AVAILABLE
     })
   })
 
@@ -92,9 +93,13 @@ program
       const db = await DB.getInstance()
       const command = new InsertionCommand(db)
       for (const insertion of dataToInsert) {
+        // goals are inserted along with matches
+        if (insertion === Insertions.GOALS) continue
         if (insertion === Insertions.MATCHES) {
           const valuesToInsert = await parseMatchesFiles()
           await command.Insertion(insertion, valuesToInsert)
+          const goalsValues = await parseGoalsValues()
+          await command.Insertion(Insertions.GOALS, goalsValues)
           continue
         }
         const getValuesFunction = ValuesParserMap.get(insertion as Insertions)
