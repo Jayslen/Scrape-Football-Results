@@ -1,19 +1,19 @@
-import js from "@eslint/js";
-import globals from "globals";
-import tseslint from "typescript-eslint";
-import { defineConfig } from "eslint/config";
+import js from '@eslint/js'
+import globals from 'globals'
+import tseslint from 'typescript-eslint'
+import { defineConfig } from 'eslint/config'
 
 export default defineConfig([
   {
-    files: ["**/*.{js,mjs,cjs,ts,mts,cts}"],
+    files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
     plugins: { js },
-    extends: ["js/recommended"],
-    languageOptions: { globals: globals.node },
+    extends: ['js/recommended'],
+    languageOptions: { globals: globals.node }
   },
   tseslint.configs.recommended,
   tseslint.config({
     rules: {
-      "@typescript-eslint/no-explicit-any": "warn",
-    },
-  }),
-]);
+      '@typescript-eslint/no-explicit-any': 'warn'
+    }
+  })
+])

@@ -26,9 +26,9 @@ export class FilesParser {
           ...team,
           stadium: {
             ...team.stadium,
-            name: team.stadium.name.replaceAll("'", "''"),
+            name: team.stadium.name.replaceAll("'", "''")
           },
-          league: leagued.league,
+          league: leagued.league
         }
       })
     )
@@ -44,7 +44,7 @@ export class FilesParser {
       return {
         name: team.teamName,
         league: team.league,
-        stadium: team.stadium.name,
+        stadium: team.stadium.name
       }
     })
     const player = teams.flatMap((team) =>
@@ -56,7 +56,7 @@ export class FilesParser {
             player.marketValue.slice(-1) === 'M'
               ? parseFloat(player.marketValue.slice(0, -1)) * 1_000_000
               : parseFloat(player.marketValue.slice(0, -1)) * 1_000,
-          shirt: parseInt(player.shirt),
+          shirt: parseInt(player.shirt)
         }
       })
     )
@@ -72,7 +72,7 @@ export class FilesParser {
       stadiums,
       teams: teamsParse,
       players: player,
-      playersPositions,
+      playersPositions
     }
   }
 
@@ -111,7 +111,7 @@ export class FilesParser {
         matchesData
           .flatMap((data) => data.matches.map((match) => match.details.stadium))
           .filter((stadium) => !stadiumsDb.has(stadium))
-      ),
+      )
     ]
 
     const teamsNotInDB = [
@@ -119,7 +119,7 @@ export class FilesParser {
         matchesData
           .flatMap((data) => data.matches.flatMap((match) => match.teams))
           .filter((team) => !teamsDb.has(team))
-      ),
+      )
     ]
 
     const goalScorersNotInDB = new Set(

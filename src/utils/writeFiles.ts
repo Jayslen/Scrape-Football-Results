@@ -3,7 +3,11 @@ import fs from 'node:fs/promises'
 import { Teams } from '@customTypes/teams'
 import { MatchDetails } from '@customTypes/matches'
 
-export async function writeData(filePaths: { data: MatchDetails | Teams, dir: string, fileName: string }) {
+export async function writeData(filePaths: {
+  data: MatchDetails | Teams
+  dir: string
+  fileName: string
+}) {
   const { data, dir, fileName } = filePaths
   const { root } = path.parse(process.cwd())
 
@@ -11,7 +15,7 @@ export async function writeData(filePaths: { data: MatchDetails | Teams, dir: st
 
   await fs.mkdir(route, { recursive: true })
 
-  await fs.writeFile((route + fileName), JSON.stringify(data))
+  await fs.writeFile(route + fileName, JSON.stringify(data))
 
   const savedFilePath = path.join(route, fileName)
   console.log('Date saved in:', savedFilePath)

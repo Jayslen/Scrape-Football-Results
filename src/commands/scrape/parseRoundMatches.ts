@@ -4,7 +4,7 @@ import {
   MatchGoals,
   PlayersStats,
   Position,
-  Stats,
+  Stats
 } from '@customTypes/matches'
 import { PageInstance } from '@customTypes/core'
 import { getPlayerStats } from '../../utils/extractPlayerMatchStats.js'
@@ -23,7 +23,7 @@ const {
   __playerStatsPopup,
   __playerPopupName,
   __playerPopupRaiting,
-  __doneButton,
+  __doneButton
 } = MATCH_ELEMENT_SELECTORS
 
 export async function getRoundMatches(input: {
@@ -108,12 +108,12 @@ export async function getRoundMatches(input: {
           playerHasScore
             ? page.locator(__playerPopupRaiting).innerText()
             : 'N/A',
-          page.locator('.info-span').first().innerText(),
+          page.locator('.info-span').first().innerText()
         ])
 
         goals[i][j] = {
           scorer: name,
-          minute: goal.time,
+          minute: goal.time
         }
 
         const playerStats: Stats = await getPlayerStats({ page })
@@ -122,7 +122,7 @@ export async function getRoundMatches(input: {
           name,
           position: position as Position,
           score,
-          stats: playerStats,
+          stats: playerStats
         })
 
         await page.locator(__doneButton).click()
@@ -147,8 +147,8 @@ export async function getRoundMatches(input: {
         date,
         stadium,
         attendance,
-        referee,
-      },
+        referee
+      }
     })
 
     if ((await page.locator(__matchStatus).innerText()) === 'Abandoned')
@@ -180,7 +180,7 @@ export async function getRoundMatches(input: {
       const [name, score, position] = await Promise.all([
         page.locator(__playerPopupName).innerText(),
         playerHasScore ? page.locator(__playerPopupRaiting).innerText() : 'N/A',
-        page.locator('.info-span').first().innerText(),
+        page.locator('.info-span').first().innerText()
       ])
 
       const existingPlayerStats = goalScorerStats.find((ps) => ps.name === name)
@@ -205,7 +205,7 @@ export async function getRoundMatches(input: {
           name,
           position: position as Position,
           score,
-          stats: playerStats,
+          stats: playerStats
         })
       }
       await page.locator(__doneButton).click()

@@ -16,7 +16,7 @@ export async function parseMatchesFiles() {
     for (const match of matches) {
       const {
         teams,
-        details: { attendance, stadium, referee, date },
+        details: { attendance, stadium, referee, date }
       } = match
       const [leagueName, leagueSeason] = league.split(/\s(?=[^ ]*$)/)
       matchesValues.push([
@@ -31,7 +31,7 @@ export async function parseMatchesFiles() {
         `${parseInt(matchWeek)}`,
         `STR_TO_DATE('${new Date(date).toDateString()}', '%a %b %d %Y')`,
         `UUID_TO_BIN('${stadiumsDbMap.get(stadium)}', 1)`,
-        `${referee}`,
+        `${referee}`
       ])
     }
   }

@@ -15,8 +15,8 @@ const filesData: FilesData = {
   leaguesValues: LEAGUES_AVAILABLE.map((league) => [
     league.name,
     `UUID_TO_BIN('${randomUUID()}', 1)`,
-    `(SELECT country_id FROM countries WHERE LOWER(country) = LOWER('${league.country}'))`,
-  ]),
+    `(SELECT country_id FROM countries WHERE LOWER(country) = LOWER('${league.country}'))`
+  ])
 }
 
 const { countries, teams, players, playersPositions, positions, stadiums } =
@@ -28,7 +28,7 @@ const {
   stadiumsValues,
   teamsValues,
   playersPositionsValues,
-  playersValues,
+  playersValues
 } = filesData
 
 export const ValuesParserMap = new Map<Insertions, () => Promise<string[][]>>()
@@ -41,7 +41,7 @@ ValuesParserMap.set(Insertions.COUNTRIES, async () => {
   countriesValues.push(
     ...countries.map((country) => [
       country,
-      `UUID_TO_BIN('${randomUUID()}', 1)`,
+      `UUID_TO_BIN('${randomUUID()}', 1)`
     ])
   )
   return countriesValues
@@ -51,7 +51,7 @@ ValuesParserMap.set(Insertions.POSITIONS, async () => {
   positionsValues.push(
     ...positions.map((position) => [
       position,
-      `UUID_TO_BIN('${randomUUID()}', 1)`,
+      `UUID_TO_BIN('${randomUUID()}', 1)`
     ])
   )
   return positionsValues
@@ -64,7 +64,7 @@ ValuesParserMap.set(Insertions.STADIUMS, async () => {
       name,
       capacity,
       yearOpened,
-      surface,
+      surface
     ])
   )
   return stadiumsValues
@@ -81,7 +81,7 @@ ValuesParserMap.set(Insertions.TEAMS, async () => {
         `UUID_TO_BIN('${randomUUID()}', 1)`,
         name,
         `UUID_TO_BIN('${countriesDbMap.get(country)}', 1)`,
-        `UUID_TO_BIN('${stadiumDbMap.get(stadium)}', 1)`,
+        `UUID_TO_BIN('${stadiumDbMap.get(stadium)}', 1)`
       ]
     })
   )
@@ -90,7 +90,7 @@ ValuesParserMap.set(Insertions.TEAMS, async () => {
 
 ValuesParserMap.set(Insertions.PLAYERS, async () => {
   const countriesDbMap = await PreloadDBData.countries()
-  const teamsDbMap = await PreloadDBData.teams()
+  const teamsDbMap = await PreloadDBData.teams(true)
   playersValues.push(
     ...players.map(
       ({ name, country, team, shirt: shirtNumber, height, marketValue }) => [
@@ -100,7 +100,7 @@ ValuesParserMap.set(Insertions.PLAYERS, async () => {
         `${isNaN(height) ? 'NULL' : height}`,
         `${isNaN(marketValue) ? 'NULL' : marketValue}`,
         `UUID_TO_BIN('${countriesDbMap.get(country)}', 1)`,
-        `UUID_TO_BIN('${teamsDbMap.get(team)}', 1)`,
+        `UUID_TO_BIN('${teamsDbMap.get(team)}', 1)`
       ]
     )
   )
@@ -109,7 +109,7 @@ ValuesParserMap.set(Insertions.PLAYERS, async () => {
 
 ValuesParserMap.set(Insertions.PLAYERS_POSITIONS, async () => {
   const positionsDbMap = await PreloadDBData.positions()
-  const playersWithTeam = await PreloadDBData.players()
+  const playersWithTeam = await PreloadDBData.playersWithTeams()
 
   playersPositionsValues.push(
     ...playersPositions.map(({ player, position }) => {
@@ -119,7 +119,7 @@ ValuesParserMap.set(Insertions.PLAYERS_POSITIONS, async () => {
       )?.player_id
       return [
         `UUID_TO_BIN('${playerId}', 1)`,
-        `UUID_TO_BIN('${positionsDbMap.get(position)}', 1)`,
+        `UUID_TO_BIN('${positionsDbMap.get(position)}', 1)`
       ]
     })
   )

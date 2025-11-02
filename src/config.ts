@@ -6,46 +6,46 @@ export const databaseConfig = {
   host: process.env.HOST,
   user: process.env.USER,
   database: process.env.DATABASE,
-  port: process.env.PORT ? parseInt(process.env.PORT, 10) : 3306,
+  port: process.env.PORT ? parseInt(process.env.PORT, 10) : 3306
 }
 
 export const statMappings = {
   accurate_passes: {
     baseKey: 'passes',
     successKey: 'successful',
-    failKey: 'missed',
+    failKey: 'missed'
   },
   shots_on_target: {
     baseKey: 'shots',
     successKey: 'on_target',
-    failKey: 'off_target',
+    failKey: 'off_target'
   },
   tackles_won: { baseKey: 'tackles', successKey: 'won', failKey: 'lost' },
   ground_duels_won: {
     baseKey: 'ground_duels',
     successKey: 'won',
-    failKey: 'lost',
+    failKey: 'lost'
   },
   aerial_duels_won: {
     baseKey: 'aerial_duels',
     successKey: 'won',
-    failKey: 'lost',
+    failKey: 'lost'
   },
   accurate_long_balls: {
     baseKey: 'long_balls',
     successKey: 'successful',
-    failKey: 'missed',
+    failKey: 'missed'
   },
   successful_dribbles: {
     baseKey: 'dribbles',
     successKey: 'successful',
-    failKey: 'missed',
+    failKey: 'missed'
   },
   accurate_crosses: {
     baseKey: 'crosses',
     successKey: 'successful',
-    failKey: 'missed',
-  },
+    failKey: 'missed'
+  }
 }
 
 export const MATCH_ELEMENT_SELECTORS = {
@@ -64,14 +64,14 @@ export const MATCH_ELEMENT_SELECTORS = {
   __playerPopupName: '.e123zo9c9 .e123zo9c1',
   __playerPopupInfo: '.e123zo9c8',
   __platerStats: '.e123zo9c10 .e123zo9c2 li:not(:first-child)',
-  __doneButton: '.e123zo9c11',
+  __doneButton: '.e123zo9c11'
 }
 
 export const TEAM_ELEMENT_SELECTORS = {
   __teamsAnchor: '.eo46u7w0 > a',
   __stadium: '.e1vbwb212',
   __team: '.eptdz4j1',
-  __playersTableRows: 'table tbody tr',
+  __playersTableRows: 'table tbody tr'
 }
 
 export const LEAGUES_AVAILABLE: LeaguesAvailable = [
@@ -79,11 +79,11 @@ export const LEAGUES_AVAILABLE: LeaguesAvailable = [
     acrom: 'premier-league',
     name: 'Premier League',
     id: 47,
-    country: 'England',
+    country: 'England'
   },
   { acrom: 'laliga', name: 'La Liga', id: 87, country: 'Spain' },
   { acrom: 'serie', name: 'Serie A', id: 55, country: 'Italy' },
-  { acrom: 'bundesliga', name: 'Bundesliga', id: 54, country: 'Germany' },
+  { acrom: 'bundesliga', name: 'Bundesliga', id: 54, country: 'Germany' }
 ]
 
 export const LEAGUES_AVAILABLE_ENUM = LEAGUES_AVAILABLE.map(

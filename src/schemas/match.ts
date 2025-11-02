@@ -11,7 +11,6 @@ export const roundSchema = z.object({
     from: z.number().min(1).max(38).optional(),
     to: z.number().min(1).max(38).optional()
   })
-
 })
 
 export const valiateRoundSchema = (input: RoundSchema) => {

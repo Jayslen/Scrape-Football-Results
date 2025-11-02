@@ -6,11 +6,24 @@ import { RoundSchema } from '@customTypes/matches'
 import { BrowserInstance, PageInstance } from '@customTypes/browser'
 
 export class ScrapeDataCommands {
-  static async rounds(input: { RoundSchema: RoundSchema, initializeBrowser: () => Promise<{ page: PageInstance, browser: BrowserInstance }>, leaguesAvailable: LeaguesAvailable }) {
+  static async rounds(input: {
+    RoundSchema: RoundSchema
+    initializeBrowser: () => Promise<{
+      browser: BrowserInstance
+      page: PageInstance
+    }>
+    leaguesAvailable: LeaguesAvailable
+  }) {
     const { RoundSchema, initializeBrowser, leaguesAvailable } = input
-    const { season, league, options: { round, from = 1, to = 38 } } = RoundSchema
+    const {
+      season,
+      league,
+      options: { round, from = 1, to = 38 }
+    } = RoundSchema
 
-    const leagueSelected = leaguesAvailable.find((data) => data.acrom === league)
+    const leagueSelected = leaguesAvailable.find(
+      (data) => data.acrom === league
+    )
 
     if (!leagueSelected) {
       console.error(`League ${league} not found.`)
@@ -23,15 +36,21 @@ export class ScrapeDataCommands {
     const roundEnd = round ?? to
     const totalRounds = roundEnd - roundStart + 1
 
-    console.log(`Fetching ${round ? `round ${round}` : `${totalRounds}`} for ${leagueSelected.name} in season ${season}... \nTotal matches to Fetch: ${totalRounds * 10}`)
+    console.log(
+      `Fetching ${round ? `round ${round}` : `${totalRounds}`} for ${leagueSelected.name} in season ${season}... \nTotal matches to Fetch: ${totalRounds * 10}`
+    )
 
-    let footmobPage = `https://www.fotmob.com/leagues/${leagueSelected.id}/matches/${leagueSelected.acrom}?season=${season}&group=by-round`
+    const footmobPage = `https://www.fotmob.com/leagues/${leagueSelected.id}/matches/${leagueSelected.acrom}?season=${season}&group=by-round`
 
     let matchesFetched = 0
 
     for (let i = roundStart; i <= roundEnd; i++) {
-    await page.goto(footmobPage + `&round=${i - 1}`, { waitUntil: 'load' })
-      const { results, updateMatchesFetched } = await getRoundMatches({ page, totalMatches: totalRounds * 10, matchesFetched })
+      await page.goto(footmobPage + `&round=${i - 1}`, { waitUntil: 'load' })
+      const { results, updateMatchesFetched } = await getRoundMatches({
+        page,
+        totalMatches: totalRounds * 10,
+        matchesFetched
+      })
 
       matchesFetched = updateMatchesFetched
       try {
@@ -47,9 +66,18 @@ export class ScrapeDataCommands {
     await browser.close()
   }
 
-  static async teams(input: { league: League, initializeBrowser: Function, leaguesAvailable: LeaguesAvailable }) {
+  static async teams(input: {
+    league: League
+    initializeBrowser: () => Promise<{
+      browser: BrowserInstance
+      page: PageInstance
+    }>
+    leaguesAvailable: LeaguesAvailable
+  }) {
     const { league, leaguesAvailable, initializeBrowser } = input
-    const leagueSelected = leaguesAvailable.find((data) => data.acrom === league)
+    const leagueSelected = leaguesAvailable.find(
+      (data) => data.acrom === league
+    )
 
     if (!leagueSelected) {
       console.error(`League ${league} not found.`)
@@ -61,7 +89,11 @@ export class ScrapeDataCommands {
     const url = `https://www.fotmob.com/leagues/${leagueSelected.id}/table/${leagueSelected.acrom}`
 
     try {
-      const teams = await getTeams({ page, url, leagueName: leagueSelected.name })
+      const teams = await getTeams({
+        page,
+        url,
+        leagueName: leagueSelected.name
+      })
 
       writeData({
         data: teams,

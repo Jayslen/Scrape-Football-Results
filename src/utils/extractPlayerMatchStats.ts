@@ -1,4 +1,4 @@
-import { PlayersStats, Stats } from '@customTypes/matches'
+import { Stats } from '@customTypes/matches'
 import { PageInstance } from '@customTypes/browser'
 import { MATCH_ELEMENT_SELECTORS, statMappings } from '.././config.js'
 import { mapToStats } from './mapStats.js'
@@ -6,7 +6,7 @@ import { mapToStats } from './mapStats.js'
 const { __platerStats } = MATCH_ELEMENT_SELECTORS
 
 export async function getPlayerStats({
-  page,
+  page
 }: {
   page: PageInstance
 }): Promise<Stats> {

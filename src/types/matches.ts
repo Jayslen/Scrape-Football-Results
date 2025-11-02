@@ -52,7 +52,7 @@ export enum Position {
   Rm = 'RM',
   Rw = 'RW',
   Rwb = 'RWB',
-  St = 'ST',
+  St = 'ST'
 }
 
 export interface Stats {

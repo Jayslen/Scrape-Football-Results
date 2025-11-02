@@ -13,7 +13,7 @@ export function mapToStats(rawStats: Record<string, string | number>): Stats {
     'passes_missed',
     'recoveries',
     'touches',
-    'starter',
+    'starter'
   ]
 
   // Set required fields
