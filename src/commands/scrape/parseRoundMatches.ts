@@ -23,7 +23,6 @@ const {
   __playerStatsPopup,
   __playerPopupName,
   __playerPopupRaiting,
-  __playerPopupInfo,
   __doneButton,
 } = MATCH_ELEMENT_SELECTORS
 
@@ -183,7 +182,6 @@ export async function getRoundMatches(input: {
         playerHasScore ? page.locator(__playerPopupRaiting).innerText() : 'N/A',
         page.locator('.info-span').first().innerText(),
       ])
-      console.log({ name, score, position })
 
       const existingPlayerStats = goalScorerStats.find((ps) => ps.name === name)
       const lastMatch = data.matches.at(-1)
