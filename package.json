@@ -26,8 +26,11 @@
     "@tsconfig/node22": "22.0.2",
     "@types/node": "24.0.14",
     "eslint": "9.39.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
     "globals": "16.5.0",
     "jiti": "2.6.1",
+    "prettier": "^3.6.2",
     "tsx": "4.20.3",
     "typescript-eslint": "8.46.2"
   }
