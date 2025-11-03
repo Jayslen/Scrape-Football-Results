@@ -7,3 +7,24 @@ export interface FilesData {
   playersPositionsValues: string[][]
   leaguesValues: string[][]
 }
+
+export interface TeamsParseData {
+  countries: string[]
+  positions: string[]
+  stadiums: {
+    name: string
+    capacity: string
+    yearOpened: string
+    surface: string
+  }[]
+  teams: { name: string; league: string; stadium: string }[]
+  players: {
+    name: string
+    team: string
+    country: string
+    marketValue: number
+    shirt: number
+    positions: string[]
+  }[]
+  playersPositions: { player: string; position: string }[]
+}

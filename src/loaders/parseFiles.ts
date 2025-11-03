@@ -2,13 +2,27 @@ import path, { parse } from 'path'
 import fs from 'fs/promises'
 import { Teams } from '@customTypes/teams'
 import { MatchDetails } from '@customTypes/matches'
-import DB from 'src/db/dbInstance.js'
+import DB from '../db/dbInstance.js'
 import { randomUUID } from 'crypto'
-import { scapeQuote } from 'src/utils/scapeSqlQuote.js'
+import { scapeQuote } from '../utils/scapeSqlQuote.js'
 import PreloadDBData from './preload.js'
+import { TeamsParseData } from '@customTypes/fs'
+
+const matchesData: MatchDetails[] = []
+const teamsParseData: TeamsParseData = {
+  countries: [],
+  positions: [],
+  stadiums: [],
+  teams: [],
+  players: [],
+  playersPositions: []
+}
 
 export class FilesParser {
   static async TeamsFiles() {
+    if (teamsParseData.teams.length > 0) {
+      return { ...teamsParseData }
+    }
     const { root } = parse(process.cwd())
     const teamsDirectory = path.join(root, 'football-stats', 'teams')
     const teamsFile = await fs.readdir(teamsDirectory)
@@ -33,21 +47,21 @@ export class FilesParser {
       })
     )
 
-    const countries = teams.flatMap((team) =>
+    teamsParseData.countries = teams.flatMap((team) =>
       team.players.map((player) => player.country)
     )
-    const positions = teams.flatMap((team) =>
+    teamsParseData.positions = teams.flatMap((team) =>
       team.players.flatMap((player) => player.positions)
     )
-    const stadiums = teams.map((team) => team.stadium)
-    const teamsParse = teams.map((team) => {
+    teamsParseData.stadiums = teams.map((team) => team.stadium)
+    teamsParseData.teams = teams.map((team) => {
       return {
         name: team.teamName,
         league: team.league,
         stadium: team.stadium.name
       }
     })
-    const player = teams.flatMap((team) =>
+    teamsParseData.players = teams.flatMap((team) =>
       team.players.map((player) => {
         return {
           ...player,
@@ -60,29 +74,26 @@ export class FilesParser {
         }
       })
     )
-    const playersPositions = teams.flatMap((team) =>
+    teamsParseData.playersPositions = teams.flatMap((team) =>
       team.players.flatMap((player) =>
-        player.positions.map((position) => ({ player: player.name, position }))
+        player.positions.map((position) => ({
+          player: player.name,
+          position
+        }))
       )
     )
 
-    return {
-      countries,
-      positions,
-      stadiums,
-      teams: teamsParse,
-      players: player,
-      playersPositions
-    }
+    return { ...teamsParseData }
   }
 
   static async MatchesFiles() {
-    const { root } = parse(process.cwd())
+    if (matchesData.length > 0) {
+      return matchesData
+    }
 
+    const { root } = parse(process.cwd())
     const matchesDir = path.join(root, 'football-stats', 'matches')
     const matchesFiles = await fs.readdir(matchesDir)
-
-    const matchesData: MatchDetails[] = []
 
     for (const file of matchesFiles) {
       const leagueDir = path.join(matchesDir, file)
