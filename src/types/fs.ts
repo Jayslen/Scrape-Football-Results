@@ -23,6 +23,7 @@ export interface TeamsParseData {
     team: string
     country: string
     marketValue: number
+    height: number
     shirt: number
     positions: string[]
   }[]

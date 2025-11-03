@@ -2,10 +2,10 @@ import path, { parse } from 'path'
 import fs from 'fs/promises'
 import { Teams } from '@customTypes/teams'
 import { MatchDetails } from '@customTypes/matches'
-import DB from '../db/dbInstance.js'
+import DB from '../../db/dbInstance.js'
 import { randomUUID } from 'crypto'
-import { scapeQuote } from '../utils/scapeSqlQuote.js'
-import PreloadDBData from './preload.js'
+import { scapeQuote } from '../../utils/scapeSqlQuote.js'
+import PreloadDBData from '../../utils/preload.js'
 import { TeamsParseData } from '@customTypes/fs'
 
 const matchesData: MatchDetails[] = []

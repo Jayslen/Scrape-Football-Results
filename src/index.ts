@@ -10,9 +10,7 @@ import { initializeBrowser } from './utils/initializeBrowser.js'
 import { League, LeagueSeason, Options } from '@customTypes/core'
 import { InsertionCommand } from './commands/teams-insertion/InsertionCommand.js'
 import { Insertions } from './types/core.js'
-import { parseMatchesFiles } from './loaders/parseMatchesValues.js'
-import { ValuesParserMap } from './loaders/parseTeamsValues.js'
-import { parseGoalsValues } from './loaders/parseGoalsValues.js'
+import { ValuesParserMap } from './loaders/mapValues.js'
 import DB from './db/dbInstance.js'
 
 program
@@ -93,15 +91,6 @@ program
       const db = await DB.getInstance()
       const command = new InsertionCommand(db)
       for (const insertion of dataToInsert) {
-        // goals are inserted along with matches
-        if (insertion === Insertions.GOALS) continue
-        if (insertion === Insertions.MATCHES) {
-          const valuesToInsert = await parseMatchesFiles()
-          await command.Insertion(insertion, valuesToInsert)
-          const goalsValues = await parseGoalsValues()
-          await command.Insertion(Insertions.GOALS, goalsValues)
-          continue
-        }
         const getValuesFunction = ValuesParserMap.get(insertion as Insertions)
         if (getValuesFunction) {
           const values = await getValuesFunction()

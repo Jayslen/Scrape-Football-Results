@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto'
 import { FilesParser } from './parseFiles.js'
-import PreloadDBData from './preload.js'
+import PreloadDBData from '../../utils/preload.js'
 
-export async function parseMatchesFiles() {
+export async function parseMatchesValues() {
   const matchesValues: string[][] = []
   const matchesData = await FilesParser.MatchesFiles()
 

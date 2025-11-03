@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises'
 import { FilesParser } from './parseFiles.js'
-import PreloadDBData from './preload.js'
+import PreloadDBData from '../../utils/preload.js'
 
 export async function parseGoalsValues() {
   const matches = await FilesParser.MatchesFiles()
