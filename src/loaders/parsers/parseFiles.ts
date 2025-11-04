@@ -133,13 +133,11 @@ export class FilesParser {
       )
     ]
 
-    const goalScorersNotInDB = new Set(
+    const playersNotInDB = new Set(
       matchesData
         .flatMap((data) =>
           data.matches.flatMap((match) =>
-            match.goals.flatMap((teamGoals) =>
-              teamGoals.map((goal) => goal.scorer)
-            )
+            match.playersStats.flatMap((ps) => ps.name)
           )
         )
         .filter((scorer) => !playersDb.has(scorer))
@@ -167,11 +165,11 @@ export class FilesParser {
       await db.query(`INSERT INTO teams (team_id, name) VALUES ${values}`)
     }
 
-    if (goalScorersNotInDB.size > 0) {
-      const values = Array.from(goalScorersNotInDB)
+    if (playersNotInDB.size > 0) {
+      const values = Array.from(playersNotInDB)
         .map(
-          (scorer) =>
-            `(UUID_TO_BIN('${randomUUID()}', 1), '${scapeQuote(scorer)}')`
+          (player) =>
+            `(UUID_TO_BIN('${randomUUID()}', 1), '${scapeQuote(player)}')`
         )
         .join(', ')
       await db.query(
