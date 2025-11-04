@@ -49,22 +49,22 @@ export const statMappings = {
 }
 
 export const MATCH_ELEMENT_SELECTORS = {
-  __matchAnchors: '.e1am6mxg0 a',
+  __matchAnchors: '.e1mcimok0',
   __league: '.eptdz4j1',
   __matchWeek: '.css-bp2mp7',
   __teams: '.e10mt4ks1',
-  __goalsEventContainer: '.css-1stqhah-EventContainer',
+  __goalsEventContainer: '.css-1ygojsm-EventContainer',
   __matchDetails: '.eq21sr51',
-  __attendance: '.e1c770xw8 .e1c770xw9',
-  __matchStatus: '.e1edwvyy9',
-  __startersPlayersAnchor: '.e1ugt93g0 div > a',
-  __benchPlayersAnchor: '.e1ymsyw60:nth-child(8) ul li a',
-  __playerStatsPopup: '.e123zo9c9',
-  __playerPopupRaiting: '.e123zo9c9 .e1t3jm3m0',
-  __playerPopupName: '.e123zo9c9 .e123zo9c1',
-  __playerPopupInfo: '.e123zo9c8',
-  __platerStats: '.e123zo9c10 .e123zo9c2 li:not(:first-child)',
-  __doneButton: '.e123zo9c11'
+  __attendance: '.ehqdt6x8 .ehqdt6x9',
+  __matchStatus: '.e1a6htip9',
+  __startersPlayersAnchor: '.eeniygg1 > a',
+  __benchPlayersAnchor: '.e1qn6cib0:nth-child(8) ul li a',
+  __playerStatsPopup: '.e7jo42v9',
+  __playerPopupRaiting: '.e7jo42v9 .eaxyua0',
+  __playerPopupName: '.e7jo42v9 .e7jo42v1',
+  __playerPopupInfo: '.e7jo42v8',
+  __platerStats: '.e7jo42v10 .e7jo42v5 li:not(:first-child)',
+  __doneButton: '.e7jo42v11'
 }
 
 export const TEAM_ELEMENT_SELECTORS = {

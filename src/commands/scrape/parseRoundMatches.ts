@@ -39,6 +39,7 @@ export async function getRoundMatches(input: {
     return links.map((link) => link.getAttribute('href'))
   })
 
+  console.log(matchLinks)
   data.league = await page.locator(__league).innerText()
   data.matchWeek = (await page.locator(__matchWeek).innerText())
     .split(' ')
