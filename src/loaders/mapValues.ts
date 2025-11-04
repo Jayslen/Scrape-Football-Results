@@ -2,6 +2,7 @@ import { Insertions } from '../types/core.js'
 import { parseTeamsValues } from './parsers/parseTeamsValues.js'
 import { parseMatchesValues } from './parsers/parseMatchesValues.js'
 import { parseGoalsValues } from './parsers/parseGoalsValues.js'
+import { parsePlayerstatsValues } from './parsers/parsePlayerstatsValues.js'
 
 export const ValuesParserMap = new Map<
   Insertions,
@@ -40,4 +41,8 @@ ValuesParserMap.set(Insertions.MATCHES, async () => {
 
 ValuesParserMap.set(Insertions.GOALS, async () => {
   return parseGoalsValues()
+})
+
+ValuesParserMap.set(Insertions.PLAYERSTATS, async () => {
+  return parsePlayerstatsValues()
 })

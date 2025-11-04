@@ -121,7 +121,10 @@ export class PreloadDBData {
     return playersMap
   }
 
-  static async matches() {
+  static async matches(refresh?: boolean) {
+    if (matchesMap.size > 0 && !refresh) {
+      return matchesMap
+    }
     const db = await DB.getInstance()
     const [rows] = (await db.query(
       `SELECT

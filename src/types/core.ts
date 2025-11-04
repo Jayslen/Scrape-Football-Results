@@ -25,5 +25,6 @@ export enum Insertions {
   PLAYERS = 'players',
   PLAYERS_POSITIONS = 'playersPositions',
   MATCHES = 'matches',
-  GOALS = 'goals'
+  GOALS = 'goals',
+  PLAYERSTATS = 'playersStats'
 }
