@@ -1,4 +1,3 @@
-import fs from 'node:fs/promises'
 import { FilesParser } from './parseFiles.js'
 import PreloadDBData from '../../utils/preload.js'
 
@@ -57,9 +56,5 @@ export async function parseGoalsValues() {
       }
     }
   }
-  await fs.writeFile(
-    './debug-file/goalsValues.json',
-    JSON.stringify(goalsValues, null, 2)
-  )
   return goalsValues
 }

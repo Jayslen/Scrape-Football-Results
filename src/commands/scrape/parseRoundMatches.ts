@@ -39,7 +39,6 @@ export async function getRoundMatches(input: {
     return links.map((link) => link.getAttribute('href'))
   })
 
-  console.log(matchLinks)
   data.league = await page.locator(__league).innerText()
   data.matchWeek = (await page.locator(__matchWeek).innerText())
     .split(' ')
@@ -73,8 +72,9 @@ export async function getRoundMatches(input: {
                   null
                 const time =
                   $ul.children[i]
-                    .querySelector('.elosikn11')
-                    ?.textContent?.split(',') || []
+                    .querySelector('.ef2j5yj12')
+                    ?.textContent?.replace(/[\u200E\u200F\u202A-\u202E]/g, '')
+                    .split(',') || []
                 if (href && time) goals[index].push({ href, time })
               }
             })
