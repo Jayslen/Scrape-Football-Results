@@ -29,12 +29,12 @@ program
   .option('-r, --round <number>', 'Get a specific round')
   .option('-f, --from <number>', 'Define the start round', '1')
   .option('-t, --to <number>', 'Define limit round', '38')
-  .option('-p, --parallel', 'Doing the process in parallel workers')
+  .option('-p, --parallel <number>', 'Set number of parallel workers (max 5)')
   .action(async (league: League, season: LeagueSeason, options: Options) => {
     const modifiedOptions: Options = {
-      ...options,
       from: Number(options.from),
       to: Number(options.to),
+      parallel: options.parallel ? Number(options.parallel) : undefined,
       round: options.round ? Number(options.round) : undefined
     }
 
@@ -74,13 +74,18 @@ program
       return
     }
 
+    const workersCount =
+      options.parallel > totalRounds ? totalRounds : options.parallel
     const __filename = fileURLToPath(import.meta.url)
     const __dirname = path.dirname(__filename)
     const workerPath = path.resolve(__dirname, 'worker.js')
 
     const workerPromises = []
-    console.log(`Starting scraping ${totalRounds} for ${league} - ${season}`)
-    for (let i = 0; i < 2; i++) {
+    console.log(
+      `Starting scraping ${totalRounds} rounds for ${league} - ${season}`
+    )
+    console.log('Using worker threads: ', workersCount)
+    for (let i = 0; i < workersCount; i++) {
       const worker = new Worker(workerPath, {
         workerData: {
           season: roundData.season,

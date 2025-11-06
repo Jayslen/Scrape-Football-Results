@@ -5,7 +5,7 @@ export type Options = {
   round?: number
   from: number
   to: number
-  parallel?: boolean
+  parallel?: number
 }
 export type League = 'premier-league' | 'laliga' | 'serie' | 'bundesliga'
 export type LeaguesAvailable = {

@@ -9,7 +9,15 @@ export const roundSchema = z.object({
   options: z.object({
     round: z.number().min(1).max(38).optional(),
     from: z.number().min(1).max(38),
-    to: z.number().min(1).max(38)
+    to: z.number().min(1).max(38),
+    parallel: z
+      .number()
+      .min(2, 'In order to use parallel workers, at least 2 is required.')
+      .max(
+        5,
+        'For prevent overload, the maximum number of parallel workers is 5.'
+      )
+      .optional()
   })
 })
 
