@@ -8,8 +8,8 @@ export const roundSchema = z.object({
   league: z.enum(LEAGUES_AVAILABLE_ENUM as [League, ...League[]]),
   options: z.object({
     round: z.number().min(1).max(38).optional(),
-    from: z.number().min(1).max(38).optional(),
-    to: z.number().min(1).max(38).optional()
+    from: z.number().min(1).max(38),
+    to: z.number().min(1).max(38)
   })
 })
 

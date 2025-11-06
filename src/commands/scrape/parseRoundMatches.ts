@@ -29,11 +29,11 @@ const {
 export async function getRoundMatches(input: {
   page: PageInstance
   totalMatches: number
-  matchesFetched: number
+  matchesFetched: Int32Array
 }) {
   const { page, totalMatches } = input
   const data: MatchDetails = { league: '', matchWeek: '', matches: [] }
-  let { matchesFetched } = input
+  const { matchesFetched } = input
 
   const matchLinks = await page.$$eval(__matchAnchors, (links) => {
     return links.map((link) => link.getAttribute('href'))
@@ -211,10 +211,10 @@ export async function getRoundMatches(input: {
       }
       await page.locator(__doneButton).click()
     }
+    Atomics.add(matchesFetched, 0, 1)
     console.log(
-      `${teams[0]} vs ${teams[1]} matchweek ${data.matchWeek} stats collected.`
+      `${teams[0]} vs ${teams[1]} matchweek ${data.matchWeek} stats collected (${Atomics.load(matchesFetched, 0)} / ${totalMatches}...)`
     )
-    console.log(`${++matchesFetched} / ${totalMatches} Matches collected.`)
   }
-  return { results: data, updateMatchesFetched: matchesFetched }
+  return { results: data }
 }

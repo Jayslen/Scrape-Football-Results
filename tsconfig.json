@@ -3,6 +3,7 @@
   "compilerOptions": {
     "outDir": "dist",
     "baseUrl": ".",
+    "allowJs": true,
     "noEmitOnError": true,
     "paths": {
       "@customTypes/core": ["src/types/core.ts"],

@@ -1,7 +1,7 @@
 import { FilesParser } from './parseFiles.js'
 import { InsertionConfig } from '../../commands/teams-insertion/InsertionConfig.js'
 import { randomUUID } from 'crypto'
-import PreloadDBData from 'src/utils/preload.js'
+import PreloadDBData from '../../utils/preload.js'
 
 const statsOrder = InsertionConfig.playersStats.columns
 export async function parsePlayerstatsValues() {

@@ -3,8 +3,9 @@ import { Page, Browser } from 'playwright'
 export type LeagueSeason = `${string}-${string}`
 export type Options = {
   round?: number
-  from?: number
-  to?: number
+  from: number
+  to: number
+  parallel?: boolean
 }
 export type League = 'premier-league' | 'laliga' | 'serie' | 'bundesliga'
 export type LeaguesAvailable = {

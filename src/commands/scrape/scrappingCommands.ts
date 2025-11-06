@@ -2,24 +2,30 @@ import { getRoundMatches } from './parseRoundMatches.js'
 import { getTeams } from './parseTeams.js'
 import { writeData } from '../../utils/writeFiles.js'
 import { League, LeaguesAvailable } from '@customTypes/core'
-import { RoundSchema } from '@customTypes/matches'
 import { BrowserInstance, PageInstance } from '@customTypes/browser'
 
 export class ScrapeDataCommands {
   static async rounds(input: {
-    RoundSchema: RoundSchema
+    season: string
+    league: League
+    totalRounds: number
+    leaguesAvailable: LeaguesAvailable
+    roundToFetch: Int32Array
+    matchesFetched: Int32Array
     initializeBrowser: () => Promise<{
       browser: BrowserInstance
       page: PageInstance
     }>
-    leaguesAvailable: LeaguesAvailable
   }) {
-    const { RoundSchema, initializeBrowser, leaguesAvailable } = input
     const {
       season,
       league,
-      options: { round, from = 1, to = 38 }
-    } = RoundSchema
+      totalRounds,
+      initializeBrowser,
+      leaguesAvailable,
+      roundToFetch,
+      matchesFetched
+    } = input
 
     const leagueSelected = leaguesAvailable.find(
       (data) => data.acrom === league
@@ -31,28 +37,17 @@ export class ScrapeDataCommands {
     }
 
     const { browser, page } = await initializeBrowser()
-
-    const roundStart = round ?? from
-    const roundEnd = round ?? to
-    const totalRounds = roundEnd - roundStart + 1
-
-    console.log(
-      `Fetching ${round ? `round ${round}` : `${totalRounds}`} for ${leagueSelected.name} in season ${season}... \nTotal matches to Fetch: ${totalRounds * 10}`
-    )
-
     const footmobPage = `https://www.fotmob.com/leagues/${leagueSelected.id}/matches/${leagueSelected.acrom}?season=${season}&group=by-round`
 
-    let matchesFetched = 0
-
-    for (let i = roundStart; i <= roundEnd; i++) {
+    while (Atomics.load(roundToFetch, 0) <= totalRounds) {
+      const i = Atomics.add(roundToFetch, 0, 1)
+      console.log(`Fetching matches for round ${i}...`)
       await page.goto(footmobPage + `&round=${i - 1}`, { waitUntil: 'load' })
-      const { results, updateMatchesFetched } = await getRoundMatches({
+      const { results } = await getRoundMatches({
         page,
         totalMatches: totalRounds * 10,
         matchesFetched
       })
-
-      matchesFetched = updateMatchesFetched
       try {
         await writeData({
           data: results,
@@ -63,7 +58,9 @@ export class ScrapeDataCommands {
         console.error('Error writing data:', Error)
       }
     }
-    await browser.close()
+    if (Atomics.load(roundToFetch, 0) === totalRounds + 1) {
+      await browser.close()
+    }
   }
 
   static async teams(input: {

@@ -2,6 +2,9 @@
 
 import { program } from 'commander'
 import { prettifyError } from 'zod/v4'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { Worker } from 'node:worker_threads'
 import { LEAGUES_AVAILABLE } from './config.js'
 import { ScrapeDataCommands } from './commands/scrape/scrappingCommands.js'
 import { valiateRoundSchema } from './schemas/match.js'
@@ -24,17 +27,16 @@ program
   .command('round <league> <season>')
   .description('Fetch rounds for a specific league')
   .option('-r, --round <number>', 'Get a specific round')
-  .option('-f, --from <number>', 'Define the start round')
-  .option('-t, --to <number>', 'Define limit round')
-  .action(async (league: League, season: LeagueSeason, options) => {
-    const modifiedOptions: Options = Object.fromEntries(
-      Object.entries(options).map(([key, value]) => {
-        if (value) {
-          return [key, Number(value)]
-        }
-        return [key, undefined]
-      })
-    )
+  .option('-f, --from <number>', 'Define the start round', '1')
+  .option('-t, --to <number>', 'Define limit round', '38')
+  .option('-p, --parallel', 'Doing the process in parallel workers')
+  .action(async (league: League, season: LeagueSeason, options: Options) => {
+    const modifiedOptions: Options = {
+      ...options,
+      from: Number(options.from),
+      to: Number(options.to),
+      round: options.round ? Number(options.round) : undefined
+    }
 
     const {
       success,
@@ -46,11 +48,66 @@ program
       console.error(prettifyError(error))
       process.exit(1)
     }
-    await ScrapeDataCommands.rounds({
-      RoundSchema: roundData,
-      initializeBrowser,
-      leaguesAvailable: LEAGUES_AVAILABLE
-    })
+
+    const { from, to, round } = roundData.options
+
+    const roundStart = round ?? roundData.options.from
+    const totalRounds = round ?? to - from + 1
+
+    const roundToFetch = new Int32Array(new SharedArrayBuffer(4))
+    const matchesFetched = new Int32Array(new SharedArrayBuffer(4))
+    roundToFetch[0] = roundStart
+
+    if (!options.parallel) {
+      console.log(
+        `Starting scraping ${totalRounds} rounds for ${league} - ${season}`
+      )
+      await ScrapeDataCommands.rounds({
+        season,
+        league,
+        totalRounds,
+        roundToFetch,
+        matchesFetched,
+        initializeBrowser,
+        leaguesAvailable: LEAGUES_AVAILABLE
+      })
+      return
+    }
+
+    const __filename = fileURLToPath(import.meta.url)
+    const __dirname = path.dirname(__filename)
+    const workerPath = path.resolve(__dirname, 'worker.js')
+
+    const workerPromises = []
+    console.log(`Starting scraping ${totalRounds} for ${league} - ${season}`)
+    for (let i = 0; i < 2; i++) {
+      const worker = new Worker(workerPath, {
+        workerData: {
+          season: roundData.season,
+          league: roundData.league,
+          totalRounds,
+          roundToFetch,
+          matchesFetched
+        }
+      })
+
+      const promise = new Promise((resolve, reject) => {
+        worker.on('message', (msg) => {
+          console.log(`Message from worker: ${msg}`)
+        })
+
+        worker.on('exit', (code) => {
+          if (code !== 0)
+            reject(new Error(`Worker stopped with exit code ${code}`))
+          else resolve('Worker completed successfully')
+        })
+
+        worker.on('error', reject)
+      })
+
+      workerPromises.push(promise)
+    }
+    await Promise.all(workerPromises)
   })
 
 program
